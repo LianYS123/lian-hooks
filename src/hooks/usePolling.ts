@@ -1,0 +1,5 @@
+const usePolling = () => {
+    //
+};
+
+export { usePolling };
