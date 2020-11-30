@@ -1,69 +1,57 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useMutation } from './useMutation';
+import { useUpdateEffect } from './useUpdateEffect';
+import debounce from 'lodash.debounce';
 
 export interface UseRequestParamsType {
+  [key: string]: any;
   method(params?: any, ...restArgs: any[]): Promise<any>;
   defaultParams?: any;
   necessaryParams?: any;
-  restMethodArgs?: any[];
-  manual?: Boolean;
-  onError?(err: any): void;
+  autoLoad?: boolean;
 }
 
 /**
  * @description: 请求方法的简单封装，处理请求的loading状态
  * @param {*} defaultParams 默认参数
  * @param {*} necessaryParams 必要参数
- * @param {*} restMethodArgs 请求方法额外参数
- * @param {*} manual 手动请求
- * @param {*} onError 请求错误回调函数
+ * @param {*} rest 请求方法额外参数, onError事件等options可以通过这个参数传递
  */
-const useRequest = ({
+export const useRequest = ({
   method,
   defaultParams = {},
-  necessaryParams = {},
-  restMethodArgs = [],
-  manual = false,
-  onError,
+  necessaryParams,
+  autoLoad = true,
+  ...rest
 }: UseRequestParamsType) => {
-  const [params, setParams] = useState(defaultParams);
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState();
-  const [_manual, setManual] = useState(manual);
+  const [_method, requestState] = useMutation(method);
+  const paramRef = useRef(defaultParams);
+  const necessaryParamsRef = useRef(necessaryParams);
+  necessaryParamsRef.current = necessaryParams;
 
-  const loadData = async (_params = params) => {
-    const realParams = { ...necessaryParams, ..._params }; //每次请求都带上necessaryParams
-    try {
-      setLoading(true);
-      const res = await method(realParams, ...restMethodArgs);
-      setLoading(false);
-      setData(res);
-    } catch (e) {
-      setLoading(false);
-      // eslint-disable-next-line no-console
-      console.error(e);
-      if (onError) {
-        onError(e);
-      }
+  const loadData = (_params = paramRef.current) => {
+    paramRef.current = _params;
+    if (!requestState.loading) {
+      const realParams = { ...necessaryParamsRef.current, ..._params }; //每次请求都带上necessaryParams
+      debounce(_method, 100)(realParams, rest);
     }
-  };
-
-  const search = (params: any) => {
-    setParams(params);
   };
 
   const reload = () => {
     loadData();
   };
 
-  useEffect(() => {
-    if(_manual) {
-      setManual(false);
-    } else {
+  useUpdateEffect(() => {
+    if (autoLoad) {
       loadData();
     }
-  }, [params, JSON.stringify(necessaryParams)]); //使用序列化防止引用变化而数据没有变时无效的请求
+  }, [JSON.stringify(necessaryParams)]);
 
-  return { data, loading, search, reload };
+  useEffect(() => {
+    if (autoLoad) {
+      loadData();
+    }
+  }, []);
+
+  return { search: loadData, reload, ...requestState };
 };
-
-export { useRequest };

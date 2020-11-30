@@ -27,14 +27,15 @@ const defaultFormatter = (data: { content?: any } = {}) => {
  * @param defaultParams 默认请求参数
  * @param necessaryParams 必要请求参数
  * @param method 请求方法
+ * @param formatter 请求结果数据转换函数
  */
 const useTable = (options: UseTableParamsType) => {
   const {
     method,
     defaultPageSize = 10,
-    defaultParams = {},
     necessaryParams = {},
     formatter = defaultFormatter,
+    ...rest
   } = options;
   const [
     { current = 1, pageSize = defaultPageSize },
@@ -49,8 +50,8 @@ const useTable = (options: UseTableParamsType) => {
 
   const { data, loading, search, reload } = useRequest({
     method,
-    defaultParams,
     necessaryParams: realParams,
+    ...rest
   });
 
   const { total, dataSource } = formatter(data);
