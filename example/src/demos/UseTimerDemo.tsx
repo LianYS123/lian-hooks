@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTimeout, useInterval } from 'idcos-hooks';
-export const useTimerDemo = () => {
+export const UseTimerDemo = () => {
   const [count1, setCount1] = useState(0);
   const [count2, setCount2] = useState(0);
 

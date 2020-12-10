@@ -23,14 +23,16 @@ $ npm install idcos-search --save-dev
 
 #### Params
 
-| 参数            | 说明                 | 类型                                                | 默认值           |
-| :-------------- | :------------------- | :-------------------------------------------------- | :--------------- |
-| method          | 请求方法             | Function                                            | 无               |
-| defaultPageSize | 默认分页大小         | number                                              | 10               |
-| defaultParams   | 默认请求参数         | json                                                | 无               |
-| necessaryParams | 必要请求参数         | json                                                | 无               |
-| formatter       | 请求结果数据转换函数 | (data: any) => ({ total: number, dataSource: any }) | defaultFormatter |
-| autoStart       | 是否自动请求一次     | boolean                                             | true             |
+| 参数            | 说明                                       | 类型                                                | 默认值           |
+| :-------------- | :----------------------------------------- | :-------------------------------------------------- | :--------------- |
+| method          | 请求方法                                   | Function                                            | 无               |
+| defaultPageSize | 默认分页大小                               | number                                              | 10               |
+| defaultParams   | 默认请求参数                               | json                                                | 无               |
+| necessaryParams | 必要请求参数                               | json                                                | 无               |
+| formatter       | 请求结果数据转换函数                       | (data: any) => ({ total: number, dataSource: any }) | defaultFormatter |
+| autoStart       | 是否自动请求一次                           | boolean                                             | true             |
+| rowSelection    | 选项框属性，为 true 时展示默认选项框       | boolean/object                                      | 无               |
+| getAllKeys      | 用于勾选所有数据操作时获取 selectedRowKeys | () => Promise                                       | 无               |
 
 #### Result
 
@@ -77,7 +79,7 @@ const defaultFormatter = (data: { content?: any } = {}) => {
 | method          | 请求方法                                       | Function | 无     |
 | defaultParams   | 默认请求参数                                   | json     | 无     |
 | necessaryParams | 必要请求参数                                   | json     | 无     |
-| autoLoad        | 自动请求, 为true 时当必要参数变化时会发起请求 | boolean  | true   |
+| autoLoad        | 自动请求, 为 true 时当必要参数变化时会发起请求 | boolean  | true   |
 
 #### Result
 

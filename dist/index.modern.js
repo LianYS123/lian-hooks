@@ -1,108 +1,36 @@
 import { useState, useRef, useEffect } from 'react';
 import debounce from 'lodash.debounce';
 
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-
-  return target;
-}
-
-// A type of promise-like that resolves synchronously and supports only one observer
-
-const _iteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.iterator || (Symbol.iterator = Symbol("Symbol.iterator"))) : "@@iterator";
-
-const _asyncIteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.asyncIterator || (Symbol.asyncIterator = Symbol("Symbol.asyncIterator"))) : "@@asyncIterator";
-
-// Asynchronously call a function and send errors to recovery continuation
-function _catch(body, recover) {
-	try {
-		var result = body();
-	} catch(e) {
-		return recover(e);
-	}
-	if (result && result.then) {
-		return result.then(void 0, recover);
-	}
-	return result;
-}
-
-var useMutation = function useMutation(method, initialData) {
-  var _useState = useState(false),
-      loading = _useState[0],
-      setLoading = _useState[1];
-
-  var _useState2 = useState(),
-      error = _useState2[0],
-      setError = _useState2[1];
-
-  var _useState3 = useState(initialData),
-      data = _useState3[0],
-      setData = _useState3[1];
-
-  var methodRef = useRef(method);
+const useMutation = (method, initialData) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState();
+  const [data, setData] = useState(initialData);
+  const methodRef = useRef(method);
   methodRef.current = method;
 
-  var loadData = function loadData() {
-    for (var _len = arguments.length, params = new Array(_len), _key = 0; _key < _len; _key++) {
-      params[_key] = arguments[_key];
-    }
-
+  const loadData = async (...params) => {
     try {
-      var _temp2 = _catch(function () {
-        setLoading(true);
-        return Promise.resolve(methodRef.current.apply(methodRef, params)).then(function (res) {
-          setLoading(false);
-          setData(res);
-        });
-      }, function (e) {
-        setLoading(false);
-        setError(e);
-        console.error(e);
-      });
-
-      return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+      setLoading(true);
+      const res = await methodRef.current(...params);
+      setLoading(false);
+      setData(res);
     } catch (e) {
-      return Promise.reject(e);
+      setLoading(false);
+      setError(e);
+      console.error(e);
     }
   };
 
   return [loadData, {
-    loading: loading,
-    error: error,
-    data: data
+    loading,
+    error,
+    data
   }];
 };
 
-var useUpdateEffect = function useUpdateEffect(fn, deps) {
-  var isMouted = useRef(false);
-  useEffect(function () {
+const useUpdateEffect = (fn, deps) => {
+  const isMouted = useRef(false);
+  useEffect(() => {
     if (isMouted.current) {
       return fn();
     } else {
@@ -111,117 +39,102 @@ var useUpdateEffect = function useUpdateEffect(fn, deps) {
   }, deps);
 };
 
-var useRequest = function useRequest(_ref) {
-  var method = _ref.method,
-      _ref$defaultParams = _ref.defaultParams,
-      defaultParams = _ref$defaultParams === void 0 ? {} : _ref$defaultParams,
-      necessaryParams = _ref.necessaryParams,
-      _ref$autoLoad = _ref.autoLoad,
-      autoLoad = _ref$autoLoad === void 0 ? true : _ref$autoLoad,
-      rest = _objectWithoutPropertiesLoose(_ref, ["method", "defaultParams", "necessaryParams", "autoLoad"]);
-
-  var _useMutation = useMutation(method),
-      _method = _useMutation[0],
-      requestState = _useMutation[1];
-
-  var paramRef = useRef(defaultParams);
-  var necessaryParamsRef = useRef(necessaryParams);
+const useRequest = ({
+  method,
+  defaultParams: _defaultParams = {},
+  necessaryParams,
+  autoLoad: _autoLoad = true,
+  ...rest
+}) => {
+  const [_method, requestState] = useMutation(method);
+  const paramRef = useRef(_defaultParams);
+  const necessaryParamsRef = useRef(necessaryParams);
   necessaryParamsRef.current = necessaryParams;
 
-  var loadData = function loadData(_params) {
-    if (_params === void 0) {
-      _params = paramRef.current;
-    }
-
+  const loadData = (_params = paramRef.current) => {
     paramRef.current = _params;
 
     if (!requestState.loading) {
-      var realParams = _extends({}, necessaryParamsRef.current, _params);
-
+      const realParams = { ...necessaryParamsRef.current,
+        ..._params
+      };
       debounce(_method, 100)(realParams, rest);
     }
   };
 
-  var reload = function reload() {
+  const reload = () => {
     loadData();
   };
 
-  useUpdateEffect(function () {
-    if (autoLoad) {
+  useUpdateEffect(() => {
+    if (_autoLoad) {
       loadData();
     }
   }, [JSON.stringify(necessaryParams)]);
-  useEffect(function () {
-    if (autoLoad) {
+  useEffect(() => {
+    if (_autoLoad) {
       loadData();
     }
   }, []);
-  return _extends({
+  return {
     search: loadData,
-    reload: reload
-  }, requestState);
+    reload,
+    ...requestState
+  };
 };
 
-var defaultFormatter = function defaultFormatter(data) {
-  if (data === void 0) {
-    data = {};
-  }
-
-  var _ref = data.content || {},
-      _ref$total_records = _ref.total_records,
-      total_records = _ref$total_records === void 0 ? 0 : _ref$total_records,
-      _ref$records = _ref.records,
-      records = _ref$records === void 0 ? [] : _ref$records;
-
+const defaultFormatter = (data = {}) => {
+  const {
+    total_records = 0,
+    records = []
+  } = data.content || {};
   return {
     total: total_records,
     dataSource: records
   };
 };
 
-var useTable = function useTable(options) {
-  var method = options.method,
-      _options$defaultPageS = options.defaultPageSize,
-      defaultPageSize = _options$defaultPageS === void 0 ? 10 : _options$defaultPageS,
-      _options$necessaryPar = options.necessaryParams,
-      necessaryParams = _options$necessaryPar === void 0 ? {} : _options$necessaryPar,
-      _options$formatter = options.formatter,
-      formatter = _options$formatter === void 0 ? defaultFormatter : _options$formatter,
-      rest = _objectWithoutPropertiesLoose(options, ["method", "defaultPageSize", "necessaryParams", "formatter"]);
-
-  var _useState = useState({
+const useTable = options => {
+  let {
+    method,
+    defaultPageSize = 10,
+    necessaryParams = {},
+    formatter = defaultFormatter,
+    getAllKeys,
+    rowSelection: customRowSelection,
+    ...rest
+  } = options;
+  const [{
+    current = 1,
+    pageSize = defaultPageSize
+  }, onChangePaination] = useState({
     current: 1,
     pageSize: defaultPageSize
-  }),
-      _useState$ = _useState[0],
-      _useState$$current = _useState$.current,
-      current = _useState$$current === void 0 ? 1 : _useState$$current,
-      _useState$$pageSize = _useState$.pageSize,
-      pageSize = _useState$$pageSize === void 0 ? defaultPageSize : _useState$$pageSize,
-      onChangePaination = _useState[1];
-
-  var realParams = _extends({}, necessaryParams, {
+  });
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const realParams = { ...necessaryParams,
     page: current,
     page_size: pageSize
+  };
+  const {
+    data,
+    loading,
+    search,
+    reload
+  } = useRequest({
+    method,
+    necessaryParams: realParams,
+    ...rest
   });
+  const {
+    total,
+    dataSource
+  } = formatter(data);
 
-  var _useRequest = useRequest(_extends({
-    method: method,
-    necessaryParams: realParams
-  }, rest)),
-      data = _useRequest.data,
-      loading = _useRequest.loading,
-      search = _useRequest.search,
-      reload = _useRequest.reload;
-
-  var _formatter = formatter(data),
-      total = _formatter.total,
-      dataSource = _formatter.dataSource;
-
-  var onChange = function onChange(current, pageSize) {
-    var toCurrent = current <= 0 ? 1 : current;
-    var toPageSize = pageSize <= 0 ? 1 : pageSize;
-    var tempTotalPage = Math.ceil(total / toPageSize);
+  const onChange = (current, pageSize) => {
+    let toCurrent = current <= 0 ? 1 : current;
+    const toPageSize = pageSize <= 0 ? 1 : pageSize;
+    const tempTotalPage = Math.ceil(total / toPageSize);
 
     if (tempTotalPage && toCurrent > tempTotalPage) {
       toCurrent = tempTotalPage;
@@ -233,124 +146,123 @@ var useTable = function useTable(options) {
     });
   };
 
-  var pagination = {
-    current: current,
-    pageSize: pageSize,
-    total: total,
+  let selections = false;
+
+  if (getAllKeys) {
+    selections = ['SELECT_INVERT', {
+      key: 'select-all-pages',
+      text: '选择全部',
+      onSelect: async () => {
+        const keys = await (getAllKeys === null || getAllKeys === void 0 ? void 0 : getAllKeys());
+        setSelectedRowKeys(keys);
+      }
+    }, {
+      key: 'cancel-all-pages',
+      text: '取消全部',
+      onSelect: () => {
+        setSelectedRowKeys([]);
+      }
+    }];
+  }
+
+  const rowSelection = customRowSelection ? {
+    onChange: selectedRowKeys => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+    selectedRowKeys,
+    preserveSelectedRowKeys: true,
+    selections
+  } : undefined;
+
+  if (customRowSelection && typeof customRowSelection === 'object') {
+    Object.assign(rowSelection, customRowSelection);
+  }
+
+  const pagination = {
+    current,
+    pageSize,
+    total,
     onChange: onChange,
     onShowSizeChange: onChange
   };
   return {
-    loading: loading,
-    data: data,
-    reload: reload,
-    search: search,
-    pagination: pagination,
+    loading,
+    data,
+    reload,
+    search,
+    pagination,
     tableProps: {
-      dataSource: dataSource,
-      loading: loading,
-      pagination: pagination
+      dataSource,
+      loading,
+      pagination,
+      rowSelection
     }
   };
 };
 
-var useInterval = function useInterval(func, interval, deps) {
-  if (deps === void 0) {
-    deps = [];
-  }
-
-  var _useState = useState(),
-      timer = _useState[0],
-      setTimer = _useState[1];
-
-  var funcRef = useRef(func);
+const useInterval = (func, interval, deps = []) => {
+  const [timer, setTimer] = useState();
+  const funcRef = useRef(func);
   funcRef.current = func;
 
-  var clear = function clear() {
-    return clearInterval(timer);
-  };
+  const clear = () => clearInterval(timer);
 
-  useEffect(function () {
-    var I = setInterval(function () {
+  useEffect(() => {
+    const I = setInterval(() => {
       funcRef.current();
     }, interval);
     setTimer(I);
-    return function () {
-      return clearInterval(I);
-    };
+    return () => clearInterval(I);
   }, deps);
   return clear;
 };
-var useTimeout = function useTimeout(func, timeout, deps) {
-  if (deps === void 0) {
-    deps = [];
-  }
-
-  var _useState2 = useState(),
-      timer = _useState2[0],
-      setTimer = _useState2[1];
-
-  var funcRef = useRef(func);
+const useTimeout = (func, timeout, deps = []) => {
+  const [timer, setTimer] = useState();
+  const funcRef = useRef(func);
   funcRef.current = func;
 
-  var clear = function clear() {
-    return clearTimeout(timer);
-  };
+  const clear = () => clearTimeout(timer);
 
-  useEffect(function () {
-    var T = setTimeout(funcRef.current, timeout);
+  useEffect(() => {
+    const T = setTimeout(funcRef.current, timeout);
     setTimer(T);
-    return function () {
-      return clearTimeout(T);
-    };
+    return () => clearTimeout(T);
   }, deps);
   return clear;
 };
 
-var usePolling = function usePolling(_ref) {
-  var method = _ref.method,
-      onReceive = _ref.onReceive,
-      _ref$interval = _ref.interval,
-      interval = _ref$interval === void 0 ? 1000 : _ref$interval,
-      _ref$errorRetryCount = _ref.errorRetryCount,
-      errorRetryCount = _ref$errorRetryCount === void 0 ? 0 : _ref$errorRetryCount,
-      _ref$autoStart = _ref.autoStart,
-      autoStart = _ref$autoStart === void 0 ? false : _ref$autoStart;
+const usePolling = ({
+  method,
+  onReceive,
+  interval: _interval = 1000,
+  errorRetryCount: _errorRetryCount = 0,
+  autoStart: _autoStart = false
+}) => {
+  const [request, {
+    loading,
+    error,
+    data
+  }] = useMutation(method);
+  const [polling, setPolling] = useState(_autoStart);
+  const [retryCount, setRetryCount] = useState(_errorRetryCount);
 
-  var _useMutation = useMutation(method),
-      request = _useMutation[0],
-      _useMutation$ = _useMutation[1],
-      loading = _useMutation$.loading,
-      error = _useMutation$.error,
-      data = _useMutation$.data;
-
-  var _useState = useState(autoStart),
-      polling = _useState[0],
-      setPolling = _useState[1];
-
-  var _useState2 = useState(errorRetryCount),
-      retryCount = _useState2[0],
-      setRetryCount = _useState2[1];
-
-  var start = function start() {
+  const start = () => {
     if (polling === false) {
       setPolling(true);
       request();
     }
   };
 
-  var onError = function onError() {
+  const onError = () => {
     if (retryCount) {
-      setRetryCount(function (count) {
-        return count - 1;
-      });
+      setRetryCount(count => count - 1);
       request();
     } else {
       cancel();
     }
   };
 
-  var onSuccess = function onSuccess() {
+  const onSuccess = () => {
     if (onReceive && onReceive(data) === true) {
       cancel();
     } else {
@@ -359,7 +271,7 @@ var usePolling = function usePolling(_ref) {
     }
   };
 
-  var clear = useInterval(function () {
+  const clear = useInterval(() => {
     if (polling) {
       if (error) {
         onError();
@@ -367,19 +279,19 @@ var usePolling = function usePolling(_ref) {
         onSuccess();
       }
     }
-  }, interval, [data, error, polling]);
+  }, _interval, [data, error, polling]);
 
-  var cancel = function cancel() {
+  const cancel = () => {
     clear();
     setPolling(false);
   };
 
   return {
-    start: start,
-    cancel: cancel,
-    loading: loading,
-    data: data,
-    polling: polling
+    start,
+    cancel,
+    loading,
+    data,
+    polling
   };
 };
 
@@ -388,7 +300,7 @@ function getTargetElement(target, defaultElement) {
     return defaultElement;
   }
 
-  var targetElement;
+  let targetElement;
 
   if (typeof target === 'function') {
     targetElement = target();
@@ -401,11 +313,11 @@ function getTargetElement(target, defaultElement) {
   return targetElement;
 }
 
-var useEventListener = function useEventListener(target, eventName, listener) {
-  var listenerRef = useRef(listener);
+const useEventListener = (target, eventName, listener) => {
+  const listenerRef = useRef(listener);
   listenerRef.current = listener;
-  var targetElement = getTargetElement(target, window);
-  useEffect(function () {
+  const targetElement = getTargetElement(target, window);
+  useEffect(() => {
     if (!(targetElement === null || targetElement === void 0 ? void 0 : targetElement.addEventListener)) {
       return;
     }
@@ -414,15 +326,13 @@ var useEventListener = function useEventListener(target, eventName, listener) {
     return targetElement.removeEventListener.bind(targetElement, listenerRef.current);
   }, [eventName]);
 };
-var useSize = function useSize(ref) {
-  var _useState = useState({
+const useSize = ref => {
+  const [size, setSize] = useState({
     width: 0,
     height: 0
-  }),
-      size = _useState[0],
-      setSize = _useState[1];
+  });
 
-  var _setSize = function _setSize() {
+  const _setSize = () => {
     setSize({
       width: ref.current ? ref.current.clientWidth : 0,
       height: ref.current ? ref.current.clientHeight : 0
@@ -430,11 +340,11 @@ var useSize = function useSize(ref) {
   };
 
   useEventListener(window, 'resize', _setSize);
-  useEffect(function () {
+  useEffect(() => {
     _setSize();
   }, []);
   return size;
 };
 
-export { useEventListener, useInterval, useMutation, usePolling, useRequest, useSize, useTable, useTimeout };
+export { useEventListener, useInterval, useMutation, usePolling, useRequest, useSize, useTable, useTimeout, useUpdateEffect };
 //# sourceMappingURL=index.modern.js.map

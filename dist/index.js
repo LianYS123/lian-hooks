@@ -189,7 +189,9 @@ var useTable = function useTable(options) {
       necessaryParams = _options$necessaryPar === void 0 ? {} : _options$necessaryPar,
       _options$formatter = options.formatter,
       formatter = _options$formatter === void 0 ? defaultFormatter : _options$formatter,
-      rest = _objectWithoutPropertiesLoose(options, ["method", "defaultPageSize", "necessaryParams", "formatter"]);
+      getAllKeys = options.getAllKeys,
+      customRowSelection = options.rowSelection,
+      rest = _objectWithoutPropertiesLoose(options, ["method", "defaultPageSize", "necessaryParams", "formatter", "getAllKeys", "rowSelection"]);
 
   var _useState = react.useState({
     current: 1,
@@ -201,6 +203,10 @@ var useTable = function useTable(options) {
       _useState$$pageSize = _useState$.pageSize,
       pageSize = _useState$$pageSize === void 0 ? defaultPageSize : _useState$$pageSize,
       onChangePaination = _useState[1];
+
+  var _useState2 = react.useState([]),
+      selectedRowKeys = _useState2[0],
+      setSelectedRowKeys = _useState2[1];
 
   var realParams = _extends({}, necessaryParams, {
     page: current,
@@ -235,6 +241,43 @@ var useTable = function useTable(options) {
     });
   };
 
+  var selections = false;
+
+  if (getAllKeys) {
+    selections = ['SELECT_INVERT', {
+      key: 'select-all-pages',
+      text: '选择全部',
+      onSelect: function () {
+        try {
+          return Promise.resolve(getAllKeys === null || getAllKeys === void 0 ? void 0 : getAllKeys()).then(function (keys) {
+            setSelectedRowKeys(keys);
+          });
+        } catch (e) {
+          return Promise.reject(e);
+        }
+      }
+    }, {
+      key: 'cancel-all-pages',
+      text: '取消全部',
+      onSelect: function onSelect() {
+        setSelectedRowKeys([]);
+      }
+    }];
+  }
+
+  var rowSelection = customRowSelection ? {
+    onChange: function onChange(selectedRowKeys) {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+    selectedRowKeys: selectedRowKeys,
+    preserveSelectedRowKeys: true,
+    selections: selections
+  } : undefined;
+
+  if (customRowSelection && typeof customRowSelection === 'object') {
+    Object.assign(rowSelection, customRowSelection);
+  }
+
   var pagination = {
     current: current,
     pageSize: pageSize,
@@ -251,7 +294,8 @@ var useTable = function useTable(options) {
     tableProps: {
       dataSource: dataSource,
       loading: loading,
-      pagination: pagination
+      pagination: pagination,
+      rowSelection: rowSelection
     }
   };
 };
@@ -446,4 +490,5 @@ exports.useRequest = useRequest;
 exports.useSize = useSize;
 exports.useTable = useTable;
 exports.useTimeout = useTimeout;
+exports.useUpdateEffect = useUpdateEffect;
 //# sourceMappingURL=index.js.map
