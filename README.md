@@ -172,3 +172,4 @@ const defaultFormatter = (data: { content?: any } = {}) => {
 
 1. 2020.11.17 版本 0.0.1
 2. 2020.11.26 版本 0.0.2 添加轮询、定时器、DOM 操作的 hooks 封装
+3. 2020.12.10 版本 0.0.3 为useTable添加选项框功能
