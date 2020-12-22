@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { useInterval } from './useTimer';
+import { useTimeout } from './useTimer';
 import { useMutation } from './useMutation';
+import { useIsMounted, useUnmount } from './useUnMount';
+import { useUpdateEffect } from './useUpdateEffect';
+import { useDocumentVisible } from './useDomHooks';
 
 export interface UsePollingParamType {
   method(...params: any[]): Promise<any>;
@@ -8,6 +11,7 @@ export interface UsePollingParamType {
   interval?: number;
   errorRetryCount?: number;
   autoStart?: boolean;
+  pollingWhenHidden?: boolean;
 }
 
 /**
@@ -25,22 +29,37 @@ export const usePolling = ({
   interval = 1000,
   errorRetryCount = 0,
   autoStart = false,
+  pollingWhenHidden = false, //窗口隐藏时，暂停请求
 }: UsePollingParamType) => {
-  const [request, { loading, error, data }] = useMutation(method);
+  const [_request, { loading, error, data }] = useMutation(method);
+  const isMounted = useIsMounted();
   const [polling, setPolling] = useState(autoStart);
   const [retryCount, setRetryCount] = useState(errorRetryCount);
+  const visible = useDocumentVisible();
+
+  const request = () => {
+    if (pollingWhenHidden || visible) {
+      setPolling(true);
+      _request();
+    }
+  };
 
   const start = () => {
-    if (polling === false) {
-      setPolling(true);
+    if (polling === false && isMounted) {
       request();
     }
   };
 
+  const cancel = () => {
+    clear();
+    setRetryCount(errorRetryCount);
+    setPolling(false);
+  };
+
   const onError = () => {
     if (retryCount) {
-      setRetryCount((count) => count - 1);
-      request()
+      setRetryCount(count => count - 1);
+      request();
     } else {
       cancel();
     }
@@ -50,12 +69,11 @@ export const usePolling = ({
     if (onReceive && onReceive(data) === true) {
       cancel();
     } else {
-      request()
-      start();
+      request();
     }
   };
 
-  const clear = useInterval(
+  const clear = useTimeout(
     () => {
       if (polling) {
         if (error) {
@@ -66,13 +84,20 @@ export const usePolling = ({
       }
     },
     interval,
-    [data, error, polling],
+    [data, error, polling]
   );
 
-  const cancel = () => {
-    clear();
-    setPolling(false);
-  };
+  useUpdateEffect(() => {
+    //窗口切回来时，尝试重新请求
+    if (!pollingWhenHidden && visible && polling) {
+      request();
+    }
+  }, [visible]);
+
+  useUnmount(() => {
+    cancel();
+  });
+
   return {
     start,
     cancel,

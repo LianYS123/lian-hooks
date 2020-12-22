@@ -17,4 +17,5 @@ export declare const useRequest: ({ method, defaultParams, necessaryParams, auto
     data: any;
     search: (_params?: any) => void;
     reload: () => void;
+    params: any;
 };

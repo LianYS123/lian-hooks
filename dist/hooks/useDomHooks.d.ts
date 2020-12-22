@@ -16,3 +16,16 @@ export declare const useSize: (ref: MutableRefObject<TargetElement>) => {
     width: number;
     height: number;
 };
+export declare const useDocumentVisible: () => boolean;
+declare type MouseAttribute = {
+    pageX: number;
+    pageY: number;
+    screenX: number;
+    screenY: number;
+    x: number;
+    y: number;
+    clientX: number;
+    clientY: number;
+};
+export declare const useMouse: () => MouseAttribute;
+export {};

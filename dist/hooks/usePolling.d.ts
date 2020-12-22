@@ -4,6 +4,7 @@ export interface UsePollingParamType {
     interval?: number;
     errorRetryCount?: number;
     autoStart?: boolean;
+    pollingWhenHidden?: boolean;
 }
 /**
  * @description: 处理轮询状态的hooks
@@ -14,7 +15,7 @@ export interface UsePollingParamType {
  * @param autoStart 是否自动触发
  * @return 轮询状态和操作函数
  */
-export declare const usePolling: ({ method, onReceive, interval, errorRetryCount, autoStart, }: UsePollingParamType) => {
+export declare const usePolling: ({ method, onReceive, interval, errorRetryCount, autoStart, pollingWhenHidden, }: UsePollingParamType) => {
     start: () => void;
     cancel: () => void;
     loading: boolean;

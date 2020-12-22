@@ -1,7 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useMutation } from './useMutation';
-import { useUpdateEffect } from './useUpdateEffect';
-import debounce from 'lodash.debounce';
+import { useDeepCompareEffect } from './useDeepCompareEffect';
 
 export interface UseRequestParamsType {
   [key: string]: any;
@@ -33,25 +32,25 @@ export const useRequest = ({
     paramRef.current = _params;
     if (!requestState.loading) {
       const realParams = { ...necessaryParamsRef.current, ..._params }; //每次请求都带上necessaryParams
-      debounce(_method, 100)(realParams, rest);
+      _method(realParams, rest);
     }
   };
 
+  //使用上次的参数重新请求
   const reload = () => {
     loadData();
   };
 
-  useUpdateEffect(() => {
+  useDeepCompareEffect(() => {
     if (autoLoad) {
       loadData();
     }
-  }, [JSON.stringify(necessaryParams)]);
+  }, [necessaryParams]);
 
-  useEffect(() => {
-    if (autoLoad) {
-      loadData();
-    }
-  }, []);
-
-  return { search: loadData, reload, ...requestState };
+  return {
+    search: loadData,
+    reload,
+    params: { ...necessaryParamsRef.current, ...paramRef.current },
+    ...requestState,
+  };
 };

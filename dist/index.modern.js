@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
-import debounce from 'lodash.debounce';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 const useMutation = (method, initialData) => {
   const [loading, setLoading] = useState(false);
@@ -28,15 +27,64 @@ const useMutation = (method, initialData) => {
   }];
 };
 
-const useUpdateEffect = (fn, deps) => {
-  const isMouted = useRef(false);
-  useEffect(() => {
-    if (isMouted.current) {
-      return fn();
-    } else {
-      isMouted.current = true;
+const useShouldUpdateEffect = (effect, deps, shouldUpdate) => {
+  const depsRef = useRef(deps);
+
+  if (shouldUpdate(depsRef.current, deps)) {
+    depsRef.current = deps;
+  }
+
+  useEffect(effect, depsRef.current);
+};
+const useCustomCompareEffect = (effect, deps, compare) => useShouldUpdateEffect(effect, deps, (...args) => !compare(...args));
+
+// do not edit .js files directly - edit src/index.jst
+
+
+
+var fastDeepEqual = function equal(a, b) {
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    if (a.constructor !== b.constructor) return false;
+
+    var length, i, keys;
+    if (Array.isArray(a)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!equal(a[i], b[i])) return false;
+      return true;
     }
-  }, deps);
+
+
+
+    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+
+    keys = Object.keys(a);
+    length = keys.length;
+    if (length !== Object.keys(b).length) return false;
+
+    for (i = length; i-- !== 0;)
+      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      var key = keys[i];
+
+      if (!equal(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  // true if both NaN, false otherwise
+  return a!==a && b!==b;
+};
+
+const useDeepCompareEffect = (effect, deps = []) => {
+  return useCustomCompareEffect(effect, deps, fastDeepEqual);
 };
 
 const useRequest = ({
@@ -58,7 +106,8 @@ const useRequest = ({
       const realParams = { ...necessaryParamsRef.current,
         ..._params
       };
-      debounce(_method, 100)(realParams, rest);
+
+      _method(realParams, rest);
     }
   };
 
@@ -66,19 +115,17 @@ const useRequest = ({
     loadData();
   };
 
-  useUpdateEffect(() => {
+  useDeepCompareEffect(() => {
     if (_autoLoad) {
       loadData();
     }
-  }, [JSON.stringify(necessaryParams)]);
-  useEffect(() => {
-    if (_autoLoad) {
-      loadData();
-    }
-  }, []);
+  }, [necessaryParams]);
   return {
     search: loadData,
     reload,
+    params: { ...necessaryParamsRef.current,
+      ...paramRef.current
+    },
     ...requestState
   };
 };
@@ -231,68 +278,32 @@ const useTimeout = (func, timeout, deps = []) => {
   return clear;
 };
 
-const usePolling = ({
-  method,
-  onReceive,
-  interval: _interval = 1000,
-  errorRetryCount: _errorRetryCount = 0,
-  autoStart: _autoStart = false
-}) => {
-  const [request, {
-    loading,
-    error,
-    data
-  }] = useMutation(method);
-  const [polling, setPolling] = useState(_autoStart);
-  const [retryCount, setRetryCount] = useState(_errorRetryCount);
+const useUnmount = fn => {
+  const fnRef = useRef();
+  fnRef.current = fn;
+  useEffect(() => {
+    return fnRef.current;
+  }, []);
+};
+const useIsUnmounted = () => {
+  const isUnmountedRef = useRef(false);
+  isUnmountedRef.current = false;
+  useUnmount(() => {
+    isUnmountedRef.current = true;
+  });
+  return isUnmountedRef.current;
+};
+const useIsMounted = () => !useIsUnmounted();
 
-  const start = () => {
-    if (polling === false) {
-      setPolling(true);
-      request();
-    }
-  };
-
-  const onError = () => {
-    if (retryCount) {
-      setRetryCount(count => count - 1);
-      request();
+const useUpdateEffect = (fn, deps) => {
+  const isMouted = useRef(false);
+  useEffect(() => {
+    if (isMouted.current) {
+      return fn();
     } else {
-      cancel();
+      isMouted.current = true;
     }
-  };
-
-  const onSuccess = () => {
-    if (onReceive && onReceive(data) === true) {
-      cancel();
-    } else {
-      request();
-      start();
-    }
-  };
-
-  const clear = useInterval(() => {
-    if (polling) {
-      if (error) {
-        onError();
-      } else {
-        onSuccess();
-      }
-    }
-  }, _interval, [data, error, polling]);
-
-  const cancel = () => {
-    clear();
-    setPolling(false);
-  };
-
-  return {
-    start,
-    cancel,
-    loading,
-    data,
-    polling
-  };
+  }, deps);
 };
 
 function getTargetElement(target, defaultElement) {
@@ -313,18 +324,27 @@ function getTargetElement(target, defaultElement) {
   return targetElement;
 }
 
+const isDocumentVisible = () => {
+  if (typeof document !== 'undefined' && typeof document.visibilityState !== 'undefined') {
+    return document.visibilityState !== 'hidden';
+  }
+
+  return true;
+};
+
 const useEventListener = (target, eventName, listener) => {
   const listenerRef = useRef(listener);
   listenerRef.current = listener;
-  const targetElement = getTargetElement(target, window);
   useEffect(() => {
-    if (!(targetElement === null || targetElement === void 0 ? void 0 : targetElement.addEventListener)) {
+    const targetElement = getTargetElement(target, window);
+
+    if (!(targetElement !== null && targetElement !== void 0 && targetElement.addEventListener)) {
       return;
     }
 
     targetElement.addEventListener(eventName, listenerRef.current);
     return targetElement.removeEventListener.bind(targetElement, listenerRef.current);
-  }, [eventName]);
+  }, [eventName, target]);
 };
 const useSize = ref => {
   const [size, setSize] = useState({
@@ -345,6 +365,280 @@ const useSize = ref => {
   }, []);
   return size;
 };
+const useDocumentVisible = () => {
+  const [visible, setVisible] = useState(isDocumentVisible());
+  useEventListener(document, 'visibilitychange', () => {
+    setVisible(isDocumentVisible());
+  });
+  return visible;
+};
+const defaultMouseAttribute = {
+  pageX: NaN,
+  pageY: NaN,
+  screenX: NaN,
+  screenY: NaN,
+  x: NaN,
+  y: NaN,
+  clientX: NaN,
+  clientY: NaN
+};
+const useMouse = () => {
+  const [attr, setAttr] = useState(defaultMouseAttribute);
+  useEventListener(window, 'mousemove', ev => {
+    const {
+      pageX,
+      pageY,
+      screenX,
+      screenY,
+      x,
+      y,
+      clientX,
+      clientY
+    } = ev;
+    setAttr({
+      pageX,
+      pageY,
+      screenX,
+      screenY,
+      x,
+      y,
+      clientX,
+      clientY
+    });
+  });
+  return attr;
+};
 
-export { useEventListener, useInterval, useMutation, usePolling, useRequest, useSize, useTable, useTimeout, useUpdateEffect };
+const usePolling = ({
+  method,
+  onReceive,
+  interval: _interval = 1000,
+  errorRetryCount: _errorRetryCount = 0,
+  autoStart: _autoStart = false,
+  pollingWhenHidden: _pollingWhenHidden = false
+}) => {
+  const [_request, {
+    loading,
+    error,
+    data
+  }] = useMutation(method);
+  const isMounted = useIsMounted();
+  const [polling, setPolling] = useState(_autoStart);
+  const [retryCount, setRetryCount] = useState(_errorRetryCount);
+  const visible = useDocumentVisible();
+
+  const request = () => {
+    if (_pollingWhenHidden || visible) {
+      setPolling(true);
+
+      _request();
+    }
+  };
+
+  const start = () => {
+    if (polling === false && isMounted) {
+      request();
+    }
+  };
+
+  const cancel = () => {
+    clear();
+    setRetryCount(_errorRetryCount);
+    setPolling(false);
+  };
+
+  const onError = () => {
+    if (retryCount) {
+      setRetryCount(count => count - 1);
+      request();
+    } else {
+      cancel();
+    }
+  };
+
+  const onSuccess = () => {
+    if (onReceive && onReceive(data) === true) {
+      cancel();
+    } else {
+      request();
+    }
+  };
+
+  const clear = useTimeout(() => {
+    if (polling) {
+      if (error) {
+        onError();
+      } else {
+        onSuccess();
+      }
+    }
+  }, _interval, [data, error, polling]);
+  useUpdateEffect(() => {
+    if (!_pollingWhenHidden && visible && polling) {
+      request();
+    }
+  }, [visible]);
+  useUnmount(() => {
+    cancel();
+  });
+  return {
+    start,
+    cancel,
+    loading,
+    data,
+    polling
+  };
+};
+
+const useDrag = (config = {}) => {
+  return data => ({
+    draggable: 'true',
+    key: JSON.stringify(data),
+    onDragStart: ev => {
+      var _config$onDragStart;
+
+      ev.dataTransfer.setData('custom', JSON.stringify(data));
+      (_config$onDragStart = config.onDragStart) === null || _config$onDragStart === void 0 ? void 0 : _config$onDragStart.call(config, data, ev);
+    },
+    onDragEnd: ev => {
+      var _config$onDragEnd;
+
+      (_config$onDragEnd = config.onDragEnd) === null || _config$onDragEnd === void 0 ? void 0 : _config$onDragEnd.call(config, data, ev);
+    }
+  });
+};
+const useDrop = options => {
+  const [isHovering, setIsHovering] = useState(false);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const props = useMemo(() => ({
+    onDragOver: ev => {
+      ev.preventDefault();
+    },
+    onDrop: ev => {
+      var _optionsRef$current$o, _optionsRef$current;
+
+      ev.preventDefault();
+      ev.persist();
+      setIsHovering(false);
+      let data = ev.dataTransfer.getData('custom');
+
+      try {
+        data = JSON.parse(data);
+      } catch (ev) {}
+
+      (_optionsRef$current$o = (_optionsRef$current = optionsRef.current).onDrop) === null || _optionsRef$current$o === void 0 ? void 0 : _optionsRef$current$o.call(_optionsRef$current, data, ev);
+    },
+    onDragEnter: ev => {
+      ev.preventDefault();
+      setIsHovering(true);
+    },
+    onDragLeave: ev => {
+      ev.preventDefault();
+      setIsHovering(false);
+    }
+  }), [setIsHovering]);
+  return [props, {
+    isHovering
+  }];
+};
+
+const throttle = (fn, t) => {
+  let shouldRun = true;
+  return (...args) => {
+    if (shouldRun) {
+      fn(...args);
+      shouldRun = false;
+      setTimeout(() => {
+        shouldRun = true;
+      }, t);
+    }
+  };
+};
+
+const useDragableBox = ({
+  defaultWidth,
+  minWidth,
+  maxWidth,
+  boxRef,
+  siderRef
+}) => {
+  const {
+    clientX
+  } = useMouse();
+  const [width, _setWidth] = useState(defaultWidth);
+  const [isDragging, setIsDragging] = useState(false);
+  const setWidth = useCallback(throttle(_setWidth, 100), []);
+  useEffect(() => {
+    const box = getTargetElement(boxRef);
+
+    if (!box.getBoundingClientRect) {
+      return;
+    }
+
+    const {
+      left
+    } = box.getBoundingClientRect() || {};
+    let newWidth = clientX - left;
+    newWidth = Math.max(minWidth, newWidth);
+    newWidth = Math.min(maxWidth, newWidth);
+
+    if (isDragging && width !== newWidth) {
+      setWidth(newWidth);
+    }
+  }, [boxRef, clientX, isDragging, maxWidth, minWidth, setWidth, siderRef]);
+  useEffect(() => {
+    if (isDragging) {
+      document.body.style.cursor = 'col-resize';
+    } else {
+      document.body.style.cursor = '';
+    }
+
+    return () => {
+      document.body.style.cursor = '';
+    };
+  }, [isDragging]);
+  useEventListener(window, 'mouseup', () => {
+    setIsDragging(false);
+  });
+  useEventListener(siderRef, 'mousedown', () => {
+    setIsDragging(true);
+  });
+  return {
+    width,
+    isDragging
+  };
+};
+
+const usePrevious = (state, compare) => {
+  const prevRef = useRef();
+  const curRef = useRef(state);
+  const shouldUpdate = typeof compare === 'function' ? compare(curRef.current, state) : true;
+
+  if (shouldUpdate) {
+    prevRef.current = curRef.current;
+    curRef.current = state;
+  }
+
+  return prevRef.current;
+};
+
+const useUnmount$1 = fn => {
+  const fnRef = useRef();
+  fnRef.current = fn;
+  useEffect(() => {
+    return fnRef.current;
+  }, []);
+};
+const useIsUnmounted$1 = () => {
+  const isUnmountedRef = useRef(false);
+  isUnmountedRef.current = false;
+  useUnmount$1(() => {
+    isUnmountedRef.current = true;
+  });
+  return isUnmountedRef.current;
+};
+const useIsMounted$1 = () => !useIsUnmounted$1();
+
+export { useCustomCompareEffect, useDeepCompareEffect, useDocumentVisible, useDrag, useDragableBox, useDrop, useEventListener, useInterval, useIsMounted$1 as useIsMounted, useIsUnmounted$1 as useIsUnmounted, useMouse, useMutation, usePolling, usePrevious, useRequest, useShouldUpdateEffect, useSize, useTable, useTimeout, useUnmount$1 as useUnmount, useUpdateEffect };
 //# sourceMappingURL=index.modern.js.map

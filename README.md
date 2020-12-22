@@ -3,7 +3,7 @@
 ## 安装
 
 ```bash
-$ npm install idcos-search --save-dev
+$ npm install idcos-hooks --save-dev
 ```
 
 ## 组件说明
@@ -173,3 +173,4 @@ const defaultFormatter = (data: { content?: any } = {}) => {
 1. 2020.11.17 版本 0.0.1
 2. 2020.11.26 版本 0.0.2 添加轮询、定时器、DOM 操作的 hooks 封装
 3. 2020.12.10 版本 0.0.3 为useTable添加选项框功能
+4. 2020.12.22 版本 0.0.4 添加useDragableBox、usePrevious、useDeepCompareEffect、useUnmout等hooks封装, 优化usePolling和useRequest
