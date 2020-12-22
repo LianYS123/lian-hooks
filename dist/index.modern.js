@@ -343,7 +343,7 @@ const useEventListener = (target, eventName, listener) => {
     }
 
     targetElement.addEventListener(eventName, listenerRef.current);
-    return targetElement.removeEventListener.bind(targetElement, listenerRef.current);
+    return targetElement.removeEventListener.bind(targetElement, eventName, listenerRef.current);
   }, [eventName, target]);
 };
 const useSize = ref => {
@@ -588,14 +588,13 @@ const useDragableBox = ({
     }
   }, [boxRef, clientX, isDragging, maxWidth, minWidth, setWidth, siderRef]);
   useEffect(() => {
-    if (isDragging) {
-      document.body.style.cursor = 'col-resize';
-    } else {
-      document.body.style.cursor = '';
-    }
+    document.body.style.cursor = isDragging ? 'col-resize' : '';
+
+    document.onselectstart = () => !isDragging;
 
     return () => {
       document.body.style.cursor = '';
+      document.onselectstart = null;
     };
   }, [isDragging]);
   useEventListener(window, 'mouseup', () => {

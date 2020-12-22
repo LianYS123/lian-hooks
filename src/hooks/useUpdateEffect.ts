@@ -6,12 +6,12 @@ import { useEffect, useRef } from 'react';
  * @param {*} deps  依赖项
  */
 export const useUpdateEffect: typeof useEffect = (fn, deps) => {
-  const isMouted = useRef(false); 
+  const isMouted = useRef(false);
   useEffect(() => {
     if (isMouted.current) {
       return fn();
     } else {
-        isMouted.current = true;
+      isMouted.current = true;
     }
   }, deps);
 };

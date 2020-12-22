@@ -12,25 +12,28 @@ export const UseDragableBox = () => {
     siderRef,
   });
   return (
-    <div style={{ display: 'flex' }}>
-      <div
-        ref={boxRef as any}
-        style={{
-          width,
-          height: 200,
-          backgroundColor: 'skyblue',
-          transition: 'width 100ms',
-        }}
-      ></div>
-      <div
-        ref={siderRef as any}
-        style={{
-          width: 5,
-          height: 200,
-          backgroundColor: 'blue',
-          cursor: 'col-resize',
-        }}
-      ></div>
-    </div>
+    <>
+      <div style={{ display: 'flex' }}>
+        <div
+          ref={boxRef as any}
+          style={{
+            width,
+            height: 200,
+            backgroundColor: 'skyblue',
+            transition: 'width 100ms',
+          }}
+        ></div>
+        <div
+          ref={siderRef as any}
+          style={{
+            width: 5,
+            height: 200,
+            backgroundColor: 'blue',
+            cursor: 'col-resize',
+          }}
+        ></div>
+      </div>
+      {'text'.repeat(100)}
+    </>
   );
 };

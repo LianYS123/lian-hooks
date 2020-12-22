@@ -23,6 +23,7 @@ export const useEventListener = (
     targetElement.addEventListener(eventName, listenerRef.current);
     return targetElement.removeEventListener.bind(
       targetElement,
+      eventName,
       listenerRef.current
     );
   }, [eventName, target]);

@@ -470,7 +470,7 @@ var useEventListener = function useEventListener(target, eventName, listener) {
     }
 
     targetElement.addEventListener(eventName, listenerRef.current);
-    return targetElement.removeEventListener.bind(targetElement, listenerRef.current);
+    return targetElement.removeEventListener.bind(targetElement, eventName, listenerRef.current);
   }, [eventName, target]);
 };
 var useSize = function useSize(ref) {
@@ -753,14 +753,15 @@ var useDragableBox = function useDragableBox(_ref) {
     }
   }, [boxRef, clientX, isDragging, maxWidth, minWidth, setWidth, siderRef]);
   react.useEffect(function () {
-    if (isDragging) {
-      document.body.style.cursor = 'col-resize';
-    } else {
-      document.body.style.cursor = '';
-    }
+    document.body.style.cursor = isDragging ? 'col-resize' : '';
+
+    document.onselectstart = function () {
+      return !isDragging;
+    };
 
     return function () {
       document.body.style.cursor = '';
+      document.onselectstart = null;
     };
   }, [isDragging]);
   useEventListener(window, 'mouseup', function () {
