@@ -16,6 +16,10 @@ export declare const useSize: (ref: MutableRefObject<TargetElement>) => {
     width: number;
     height: number;
 };
+/**
+ * @description: 获取页面是否可见
+ * @return {*} 页面可视状态
+ */
 export declare const useDocumentVisible: () => boolean;
 declare type MouseAttribute = {
     pageX: number;
@@ -27,5 +31,9 @@ declare type MouseAttribute = {
     clientX: number;
     clientY: number;
 };
+/**
+ * @description: 获取鼠标位置信息
+ * @return {*} 鼠标位置信息
+ */
 export declare const useMouse: () => MouseAttribute;
 export {};

@@ -1,19 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useMouse, useEventListener } from './useDomHooks';
-import { getTargetElement } from './utils/dom';
+import { getTargetElement, BasicTarget } from './utils/dom';
 
-//节流
-const throttle = (fn, t) => {
-  let shouldRun = true;
-  return (...args) => {
-    if (shouldRun) {
-      fn(...args);
-      shouldRun = false;
-      setTimeout(() => {
-        shouldRun = true;
-      }, t);
-    }
-  };
+type DragableBoxParams = {
+  defaultWidth: number,
+  minWidth: number,
+  maxWidth: number,
+  target: BasicTarget<HTMLElement>,
+  siderTarget: BasicTarget<HTMLElement>,
 };
 
 /**
@@ -29,15 +23,14 @@ export const useDragableBox = ({
   defaultWidth,
   minWidth,
   maxWidth,
-  boxRef,
-  siderRef,
-}) => {
+  target,
+  siderTarget,
+}: DragableBoxParams) => {
   const { clientX } = useMouse();
-  const [width, _setWidth] = useState(defaultWidth);
+  const [width, setWidth] = useState(defaultWidth);
   const [isDragging, setIsDragging] = useState(false);
-  const setWidth = useCallback(throttle(_setWidth, 100), []);
   useEffect(() => {
-    const box = getTargetElement(boxRef) as HTMLElement;
+    const box = getTargetElement(target) as HTMLElement;
     if (!box.getBoundingClientRect) {
       return;
     }
@@ -48,7 +41,7 @@ export const useDragableBox = ({
     if (isDragging && width !== newWidth) {
       setWidth(newWidth);
     }
-  }, [boxRef, clientX, isDragging, maxWidth, minWidth, setWidth, siderRef]);
+  }, [target, clientX, isDragging, maxWidth, minWidth, setWidth, siderTarget]);
   useEffect(() => {
     document.body.style.cursor = isDragging ? 'col-resize' : '';
     document.onselectstart = () => !isDragging;
@@ -60,7 +53,7 @@ export const useDragableBox = ({
   useEventListener(window, 'mouseup', () => {
     setIsDragging(false);
   });
-  useEventListener(siderRef, 'mousedown', () => {
+  useEventListener(siderTarget, 'mousedown', () => {
     setIsDragging(true);
   });
   return { width, isDragging };

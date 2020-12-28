@@ -4,6 +4,12 @@ interface IConfig {
   onDragStart?: (data: any, e: React.DragEvent) => void;
   onDragEnd?: (data: any, e: React.DragEvent) => void;
 }
+/**
+ * @description: 获取可以被拖拽的元素属性
+ * @param {function} onDragStart 拖拽开始执行的函数
+ * @param {function} onDragEnd 拖拽结束执行的函数
+ * @return {*} 一个获取拖拽属性的函数，入参为拖拽传输的数据
+ */
 export const useDrag = (config: IConfig = {}) => {
   return (data: any) => ({
     draggable: 'true' as const,
@@ -25,6 +31,11 @@ export interface DropProps {
   onDrop: React.DragEventHandler;
 }
 
+/**
+ * @description: 获取接收被拖拽内容的元素的属性
+ * @param {*} onDrop 当有元素被拖入时执行的函数
+ * @return {*} 释放元素属性
+ */
 export const useDrop = (options: {
   onDrop(data: any, ev: React.DragEvent): void;
 }): [DropProps, { isHovering: boolean }] => {
@@ -43,7 +54,7 @@ export const useDrop = (options: {
         let data = ev.dataTransfer.getData('custom');
         try {
           data = JSON.parse(data);
-        } catch (ev) {}
+        } catch (err) {}
         optionsRef.current.onDrop?.(data, ev);
       },
       onDragEnter: (ev: React.DragEvent) => {

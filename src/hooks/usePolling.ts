@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTimeout } from './useTimer';
+import { useTimeout } from './useUtils';
 import { useMutation } from './useMutation';
 import { useIsMounted, useUnmount } from './useUnMount';
 import { useUpdateEffect } from './useUpdateEffect';
@@ -21,6 +21,7 @@ export interface UsePollingParamType {
  * @param interval 请求间隔
  * @param errorRetryCount 发生错误后继续请求次数
  * @param autoStart 是否自动触发
+ * @param pollingWhenHidden 页面隐藏时是否继续请求
  * @return 轮询状态和操作函数
  */
 export const usePolling = ({
@@ -29,7 +30,7 @@ export const usePolling = ({
   interval = 1000,
   errorRetryCount = 0,
   autoStart = false,
-  pollingWhenHidden = false, //窗口隐藏时，暂停请求
+  pollingWhenHidden = false, //默认窗口隐藏时，暂停请求
 }: UsePollingParamType) => {
   const [_request, { loading, error, data }] = useMutation(method);
   const isMounted = useIsMounted();

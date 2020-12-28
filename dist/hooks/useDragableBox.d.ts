@@ -1,3 +1,11 @@
+import { BasicTarget } from './utils/dom';
+declare type DragableBoxParams = {
+    defaultWidth: number;
+    minWidth: number;
+    maxWidth: number;
+    target: BasicTarget<HTMLElement>;
+    siderTarget: BasicTarget<HTMLElement>;
+};
 /**
  * @description: 拉伸容器
  * @param {number} defaultWidth 默认宽度
@@ -7,13 +15,8 @@
  * @param {*} siderRef 用于拉伸的边缘
  * @return {object} 包含宽度和拖拽状态的对象
  */
-export declare const useDragableBox: ({ defaultWidth, minWidth, maxWidth, boxRef, siderRef, }: {
-    defaultWidth: any;
-    minWidth: any;
-    maxWidth: any;
-    boxRef: any;
-    siderRef: any;
-}) => {
-    width: any;
+export declare const useDragableBox: ({ defaultWidth, minWidth, maxWidth, target, siderTarget, }: DragableBoxParams) => {
+    width: number;
     isDragging: boolean;
 };
+export {};

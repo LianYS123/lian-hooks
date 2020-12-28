@@ -1,30 +1,31 @@
 import React, { useRef } from 'react';
-import { useDragableBox } from 'idcos-hooks';
+import { useDragableBox, useThrottledValue } from 'idcos-hooks';
 
 export const UseDragableBox = () => {
-  const boxRef = useRef<Element>();
-  const siderRef = useRef();
-  const { width } = useDragableBox({
+  const target = useRef<HTMLElement>();
+  const siderTarget = useRef<HTMLElement>();
+  const { width: _width } = useDragableBox({
     minWidth: 100,
     maxWidth: 400,
     defaultWidth: 200,
-    boxRef,
-    siderRef,
+    target,
+    siderTarget,
   });
+  const width = useThrottledValue(_width, 20);
   return (
     <>
       <div style={{ display: 'flex' }}>
         <div
-          ref={boxRef as any}
+          ref={target as any}
           style={{
             width,
             height: 200,
             backgroundColor: 'skyblue',
-            transition: 'width 100ms',
+            // transition: 'width 100ms',
           }}
         ></div>
         <div
-          ref={siderRef as any}
+          ref={siderTarget as any}
           style={{
             width: 5,
             height: 200,

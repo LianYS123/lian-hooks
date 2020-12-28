@@ -13,6 +13,7 @@ export interface UsePollingParamType {
  * @param interval 请求间隔
  * @param errorRetryCount 发生错误后继续请求次数
  * @param autoStart 是否自动触发
+ * @param pollingWhenHidden 页面隐藏时是否继续请求
  * @return 轮询状态和操作函数
  */
 export declare const usePolling: ({ method, onReceive, interval, errorRetryCount, autoStart, pollingWhenHidden, }: UsePollingParamType) => {

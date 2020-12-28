@@ -102,6 +102,7 @@ const defaultFormatter = (data: { content?: any } = {}) => {
 | onReceive       | 当接收到数据时调用的函数, 返回 true 不再继续请求 | Function | 无     |
 | interval        | 请求间隔（毫秒）                                 | number   | 1000   |
 | errorRetryCount | 发生错误后继续请求次数                           | number   | 0      |
+| pollingWhenHidden | 页面隐藏时是否继续请求                           | boolean   | false      |
 
 #### Result
 
@@ -167,6 +168,29 @@ const defaultFormatter = (data: { content?: any } = {}) => {
 | :----- | :--------- | :----- |
 | width  | 元素的宽度 | number |
 | height | 元素的高度 | number |
+
+### useDrag、useDrop
+
+#### useDrag Params
+| 参数 | 说明                | 类型   | 默认值 |
+| :--- | :------------------ | :----- | :----- |
+| onDragStart  | 拖拽开始执行的函数 | function | 无     |
+| onDragEnd  | 拖拽结束执行的函数 | function | 无     |
+
+#### useDrop Params
+| 参数 | 说明                | 类型   | 默认值 |
+| :--- | :------------------ | :----- | :----- |
+| onDrop  | 当有元素被拖入时执行的函数 | function | 无     |
+
+### useDragableBox
+| 参数 | 说明                | 类型   | 默认值 |
+| :--- | :------------------ | :----- | :----- |
+| defaultWidth  | 默认宽度 | number | 无     |
+| minWidth  | 最小宽度 | number | 无     |
+| maxWidth  | 默认宽度 | number | 无     |
+| boxRef  | 默认宽度 | object | 无     |
+| siderRef  | 默认宽度 | object | 无     |
+
 
 ## 更新日志
 

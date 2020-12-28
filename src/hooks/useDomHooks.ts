@@ -52,6 +52,10 @@ export const useSize = (ref: MutableRefObject<TargetElement>) => {
   return size;
 };
 
+/**
+ * @description: 获取页面是否可见
+ * @return {*} 页面可视状态
+ */
 export const useDocumentVisible = () => {
   const [visible, setVisible] = useState(isDocumentVisible());
   useEventListener(document, 'visibilitychange', () => {
@@ -82,6 +86,10 @@ const defaultMouseAttribute = {
   clientY: NaN
 };
 
+/**
+ * @description: 获取鼠标位置信息
+ * @return {*} 鼠标位置信息
+ */
 export const useMouse = (): MouseAttribute => {
   const [attr, setAttr] = useState<MouseAttribute>(defaultMouseAttribute);
   useEventListener(window, 'mousemove', (ev: MouseEvent) => {
