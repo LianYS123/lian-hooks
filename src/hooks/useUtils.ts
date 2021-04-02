@@ -1,4 +1,6 @@
-import { useEffect, useState, DependencyList, useRef } from 'react';
+import { useEffect, useState, DependencyList, useRef, useCallback } from 'react';
+import throttle from 'lodash.throttle';
+import debounce from 'lodash.debounce';
 
 /**
  * @description: setInterval的hooks实现
@@ -41,3 +43,33 @@ export const useTimeout = (func: () => void, timeout: number, deps: DependencyLi
   }, deps);
   return clear;
 };
+
+/**
+ * @description: 放缓获取value的速率（节流）
+ * @param {*} value 要节流的值
+ * @param {*} wait 节流时间间隔
+ * @return {*} 放缓变化的值
+ */
+export const useThrottledValue = (value, wait = 100) => {
+  const [throttledValue, setValue] = useState();
+  const setThrottledValue = useCallback(throttle(setValue, wait), []);
+  useEffect(() => {
+    setThrottledValue(value);
+  }, [value])
+  return throttledValue;
+}
+
+/**
+ * @description: 合并一定时间内多次获取value的值（防抖）
+ * @param {*} value 要节流的值
+ * @param {*} wait 节流时间间隔
+ * @return {*} 处理后的值
+ */
+export const useDebouncedValue = (value, wait = 100) => {
+  const [debouncedValue, setValue] = useState();
+  const setThrottledValue = useCallback(debounce(setValue, wait), []);
+  useEffect(() => {
+    setThrottledValue(value);
+  }, [value])
+  return debouncedValue;
+}
