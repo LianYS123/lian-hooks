@@ -1,9 +1,9 @@
-# idcos-hooks 配置
+# lian-hooks 配置
 
 ## 安装
 
 ```bash
-$ npm install idcos-hooks --save-dev
+$ npm install lian-hooks --save-dev
 ```
 
 ## 组件说明

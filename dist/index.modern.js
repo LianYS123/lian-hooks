@@ -27,226 +27,6 @@ const useMutation = (method, initialData) => {
   }];
 };
 
-const useShouldUpdateEffect = (effect, deps, shouldUpdate) => {
-  const depsRef = useRef(deps);
-
-  if (shouldUpdate(depsRef.current, deps)) {
-    depsRef.current = deps;
-  }
-
-  useEffect(effect, depsRef.current);
-};
-const useCustomCompareEffect = (effect, deps, compare) => useShouldUpdateEffect(effect, deps, (...args) => !compare(...args));
-
-// do not edit .js files directly - edit src/index.jst
-
-
-
-var fastDeepEqual = function equal(a, b) {
-  if (a === b) return true;
-
-  if (a && b && typeof a == 'object' && typeof b == 'object') {
-    if (a.constructor !== b.constructor) return false;
-
-    var length, i, keys;
-    if (Array.isArray(a)) {
-      length = a.length;
-      if (length != b.length) return false;
-      for (i = length; i-- !== 0;)
-        if (!equal(a[i], b[i])) return false;
-      return true;
-    }
-
-
-
-    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
-    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
-    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
-
-    keys = Object.keys(a);
-    length = keys.length;
-    if (length !== Object.keys(b).length) return false;
-
-    for (i = length; i-- !== 0;)
-      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
-
-    for (i = length; i-- !== 0;) {
-      var key = keys[i];
-
-      if (!equal(a[key], b[key])) return false;
-    }
-
-    return true;
-  }
-
-  // true if both NaN, false otherwise
-  return a!==a && b!==b;
-};
-
-const useDeepCompareEffect = (effect, deps = []) => {
-  return useCustomCompareEffect(effect, deps, fastDeepEqual);
-};
-
-const useRequest = ({
-  method,
-  defaultParams: _defaultParams = {},
-  necessaryParams,
-  autoLoad: _autoLoad = true,
-  ...rest
-}) => {
-  const [_method, requestState] = useMutation(method);
-  const paramRef = useRef(_defaultParams);
-  const necessaryParamsRef = useRef(necessaryParams);
-  necessaryParamsRef.current = necessaryParams;
-
-  const loadData = (_params = paramRef.current) => {
-    paramRef.current = _params;
-
-    if (!requestState.loading) {
-      const realParams = { ...necessaryParamsRef.current,
-        ..._params
-      };
-
-      _method(realParams, rest);
-    }
-  };
-
-  const reload = () => {
-    loadData();
-  };
-
-  useDeepCompareEffect(() => {
-    if (_autoLoad) {
-      loadData();
-    }
-  }, [necessaryParams]);
-  return {
-    search: loadData,
-    reload,
-    params: { ...necessaryParamsRef.current,
-      ...paramRef.current
-    },
-    ...requestState
-  };
-};
-
-const defaultFormatter = (data = {}) => {
-  const {
-    total_records = 0,
-    records = []
-  } = data.content || {};
-  return {
-    total: total_records,
-    dataSource: records
-  };
-};
-
-const useTable = options => {
-  let {
-    method,
-    defaultPageSize = 10,
-    necessaryParams = {},
-    formatter = defaultFormatter,
-    getAllKeys,
-    rowSelection: customRowSelection,
-    ...rest
-  } = options;
-  const [{
-    current = 1,
-    pageSize = defaultPageSize
-  }, onChangePaination] = useState({
-    current: 1,
-    pageSize: defaultPageSize
-  });
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const realParams = { ...necessaryParams,
-    page: current,
-    page_size: pageSize
-  };
-  const {
-    data,
-    loading,
-    search,
-    reload
-  } = useRequest({
-    method,
-    necessaryParams: realParams,
-    ...rest
-  });
-  const {
-    total,
-    dataSource
-  } = formatter(data);
-
-  const onChange = (current, pageSize) => {
-    let toCurrent = current <= 0 ? 1 : current;
-    const toPageSize = pageSize <= 0 ? 1 : pageSize;
-    const tempTotalPage = Math.ceil(total / toPageSize);
-
-    if (tempTotalPage && toCurrent > tempTotalPage) {
-      toCurrent = tempTotalPage;
-    }
-
-    onChangePaination({
-      current: toCurrent,
-      pageSize: toPageSize
-    });
-  };
-
-  let selections = false;
-
-  if (getAllKeys) {
-    selections = ['SELECT_INVERT', {
-      key: 'select-all-pages',
-      text: '选择全部',
-      onSelect: async () => {
-        const keys = await (getAllKeys === null || getAllKeys === void 0 ? void 0 : getAllKeys());
-        setSelectedRowKeys(keys);
-      }
-    }, {
-      key: 'cancel-all-pages',
-      text: '取消全部',
-      onSelect: () => {
-        setSelectedRowKeys([]);
-      }
-    }];
-  }
-
-  const rowSelection = customRowSelection ? {
-    onChange: selectedRowKeys => {
-      setSelectedRowKeys(selectedRowKeys);
-    },
-    selectedRowKeys,
-    preserveSelectedRowKeys: true,
-    selections
-  } : undefined;
-
-  if (customRowSelection && typeof customRowSelection === 'object') {
-    Object.assign(rowSelection, customRowSelection);
-  }
-
-  const pagination = {
-    current,
-    pageSize,
-    total,
-    onChange: onChange,
-    onShowSizeChange: onChange
-  };
-  return {
-    loading,
-    data,
-    reload,
-    search,
-    pagination,
-    tableProps: {
-      dataSource,
-      loading,
-      pagination,
-      rowSelection
-    }
-  };
-};
-
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 /**
@@ -1067,6 +847,51 @@ function toNumber$1(value) {
 
 var lodash_debounce = debounce$1;
 
+// do not edit .js files directly - edit src/index.jst
+
+
+
+var fastDeepEqual = function equal(a, b) {
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    if (a.constructor !== b.constructor) return false;
+
+    var length, i, keys;
+    if (Array.isArray(a)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!equal(a[i], b[i])) return false;
+      return true;
+    }
+
+
+
+    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+
+    keys = Object.keys(a);
+    length = keys.length;
+    if (length !== Object.keys(b).length) return false;
+
+    for (i = length; i-- !== 0;)
+      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      var key = keys[i];
+
+      if (!equal(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  // true if both NaN, false otherwise
+  return a!==a && b!==b;
+};
+
 const useInterval = (func, interval, deps = []) => {
   const [timer, setTimer] = useState();
   const funcRef = useRef(func);
@@ -1113,9 +938,43 @@ const useDebouncedValue = (value, wait = 100) => {
   }, [value]);
   return debouncedValue;
 };
+const useShouldUpdateEffect = (effect, deps, shouldUpdate) => {
+  const depsRef = useRef(deps);
 
+  if (shouldUpdate(depsRef.current, deps)) {
+    depsRef.current = deps;
+  }
+
+  useEffect(effect, depsRef.current);
+};
+const useCustomCompareEffect = (effect, deps, compare) => useShouldUpdateEffect(effect, deps, (...args) => !compare(...args));
+const useDeepCompareEffect = (effect, deps = []) => {
+  return useCustomCompareEffect(effect, deps, fastDeepEqual);
+};
+const usePrevious = (state, compare) => {
+  const prevRef = useRef();
+  const curRef = useRef(state);
+  const shouldUpdate = typeof compare === 'function' ? compare(curRef.current, state) : true;
+
+  if (shouldUpdate) {
+    prevRef.current = curRef.current;
+    curRef.current = state;
+  }
+
+  return prevRef.current;
+};
+const useUpdateEffect = (fn, deps) => {
+  const isMouted = useRef(false);
+  useEffect(() => {
+    if (isMouted.current) {
+      return fn();
+    } else {
+      isMouted.current = true;
+    }
+  }, deps);
+};
 const useUnmount = fn => {
-  const fnRef = useRef();
+  const fnRef = useRef(fn);
   fnRef.current = fn;
   useEffect(() => {
     return fnRef.current;
@@ -1130,16 +989,166 @@ const useIsUnmounted = () => {
   return isUnmountedRef.current;
 };
 const useIsMounted = () => !useIsUnmounted();
-
-const useUpdateEffect = (fn, deps) => {
-  const isMouted = useRef(false);
+const useLog = (...args) => {
   useEffect(() => {
-    if (isMouted.current) {
-      return fn();
-    } else {
-      isMouted.current = true;
+    console.log(...args);
+  }, args);
+};
+const useFlag = () => {
+  const [flag, setFlag] = useState(false);
+
+  const setTrue = () => setFlag(true);
+
+  const setFalse = () => setFlag(false);
+
+  const toggle = () => setFlag(f => !f);
+
+  return {
+    flag,
+    setTrue,
+    setFalse,
+    toggle
+  };
+};
+
+const useRequest = options => {
+  const {
+    method,
+    defaultParams = {},
+    necessaryParams,
+    ready = true,
+    initialData,
+    ...rest
+  } = options;
+  const [_method, requestState] = useMutation(method, initialData);
+  const paramRef = useRef(defaultParams);
+  const necessaryParamsRef = useRef(necessaryParams);
+  necessaryParamsRef.current = necessaryParams;
+
+  const loadData = (_params = paramRef.current) => {
+    paramRef.current = _params;
+
+    if (!requestState.loading) {
+      const realParams = { ...necessaryParamsRef.current,
+        ..._params
+      };
+
+      _method(realParams, rest);
     }
-  }, deps);
+  };
+
+  const reload = () => {
+    loadData();
+  };
+
+  useDeepCompareEffect(() => {
+    if (ready === true) {
+      loadData();
+    }
+  }, [necessaryParams, ready]);
+  return {
+    search: loadData,
+    reload,
+    params: { ...necessaryParamsRef.current,
+      ...paramRef.current
+    },
+    ...requestState
+  };
+};
+
+const defaultFormatter = ({
+  data: _data = []
+} = {}) => {
+  return {
+    total: _data.length,
+    dataSource: _data
+  };
+};
+
+const useTable = options => {
+  const {
+    method,
+    defaultPageSize = 10,
+    necessaryParams = {},
+    formatter = defaultFormatter,
+    rowSelection: customRowSelection,
+    ...rest
+  } = options;
+  const [{
+    current = 1,
+    pageSize = defaultPageSize
+  }, onChangePaination] = useState({
+    current: 1,
+    pageSize: defaultPageSize
+  });
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const realParams = { ...necessaryParams,
+    page: current,
+    page_size: pageSize
+  };
+  const {
+    data,
+    loading,
+    search,
+    reload
+  } = useRequest({
+    method,
+    necessaryParams: realParams,
+    ...rest
+  });
+  const {
+    total,
+    dataSource
+  } = formatter(data);
+
+  const onChange = (current, pageSize) => {
+    let toCurrent = current <= 0 ? 1 : current;
+    const toPageSize = pageSize <= 0 ? 1 : pageSize;
+    const tempTotalPage = Math.ceil(total / toPageSize);
+
+    if (tempTotalPage && toCurrent > tempTotalPage) {
+      toCurrent = tempTotalPage;
+    }
+
+    onChangePaination({
+      current: toCurrent,
+      pageSize: toPageSize
+    });
+  };
+
+  const rowSelection = customRowSelection || {
+    onChange: selectedRowKeys => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+    selectedRowKeys,
+    preserveSelectedRowKeys: true,
+    selections: false
+  };
+
+  if (customRowSelection && typeof customRowSelection === 'object') {
+    Object.assign(rowSelection, customRowSelection);
+  }
+
+  const pagination = {
+    current,
+    pageSize,
+    total,
+    onChange: onChange,
+    onShowSizeChange: onChange
+  };
+  return {
+    loading,
+    data,
+    reload,
+    search,
+    pagination,
+    tableProps: {
+      dataSource,
+      loading,
+      pagination,
+      rowSelection
+    }
+  };
 };
 
 function getTargetElement(target, defaultElement) {
@@ -1159,14 +1168,6 @@ function getTargetElement(target, defaultElement) {
 
   return targetElement;
 }
-
-const isDocumentVisible = () => {
-  if (typeof document !== 'undefined' && typeof document.visibilityState !== 'undefined') {
-    return document.visibilityState !== 'hidden';
-  }
-
-  return true;
-};
 
 const useEventListener = (target, eventName, listener) => {
   const listenerRef = useRef(listener);
@@ -1200,13 +1201,6 @@ const useSize = ref => {
     _setSize();
   }, []);
   return size;
-};
-const useDocumentVisible = () => {
-  const [visible, setVisible] = useState(isDocumentVisible());
-  useEventListener(document, 'visibilitychange', () => {
-    setVisible(isDocumentVisible());
-  });
-  return visible;
 };
 const defaultMouseAttribute = {
   pageX: NaN,
@@ -1245,101 +1239,20 @@ const useMouse = () => {
   return attr;
 };
 
-const usePolling = ({
-  method,
-  onReceive,
-  interval: _interval = 1000,
-  errorRetryCount: _errorRetryCount = 0,
-  autoStart: _autoStart = false,
-  pollingWhenHidden: _pollingWhenHidden = false
-}) => {
-  const [_request, {
-    loading,
-    error,
-    data
-  }] = useMutation(method);
-  const isMounted = useIsMounted();
-  const [polling, setPolling] = useState(_autoStart);
-  const [retryCount, setRetryCount] = useState(_errorRetryCount);
-  const visible = useDocumentVisible();
-
-  const request = () => {
-    if (_pollingWhenHidden || visible) {
-      setPolling(true);
-
-      _request();
-    }
-  };
-
-  const start = () => {
-    if (polling === false && isMounted) {
-      request();
-    }
-  };
-
-  const cancel = () => {
-    clear();
-    setRetryCount(_errorRetryCount);
-    setPolling(false);
-  };
-
-  const onError = () => {
-    if (retryCount) {
-      setRetryCount(count => count - 1);
-      request();
-    } else {
-      cancel();
-    }
-  };
-
-  const onSuccess = () => {
-    if (onReceive && onReceive(data) === true) {
-      cancel();
-    } else {
-      request();
-    }
-  };
-
-  const clear = useTimeout(() => {
-    if (polling) {
-      if (error) {
-        onError();
-      } else {
-        onSuccess();
-      }
-    }
-  }, _interval, [data, error, polling]);
-  useUpdateEffect(() => {
-    if (!_pollingWhenHidden && visible && polling) {
-      request();
-    }
-  }, [visible]);
-  useUnmount(() => {
-    cancel();
-  });
-  return {
-    start,
-    cancel,
-    loading,
-    data,
-    polling
-  };
-};
-
 const useDrag = (config = {}) => {
+  const {
+    onDragStart,
+    onDragEnd
+  } = config;
   return data => ({
     draggable: 'true',
     key: JSON.stringify(data),
     onDragStart: ev => {
-      var _config$onDragStart;
-
       ev.dataTransfer.setData('custom', JSON.stringify(data));
-      (_config$onDragStart = config.onDragStart) === null || _config$onDragStart === void 0 ? void 0 : _config$onDragStart.call(config, data, ev);
+      onDragStart && onDragStart(data, ev);
     },
     onDragEnd: ev => {
-      var _config$onDragEnd;
-
-      (_config$onDragEnd = config.onDragEnd) === null || _config$onDragEnd === void 0 ? void 0 : _config$onDragEnd.call(config, data, ev);
+      onDragEnd && onDragEnd(data, ev);
     }
   });
 };
@@ -1352,8 +1265,6 @@ const useDrop = options => {
       ev.preventDefault();
     },
     onDrop: ev => {
-      var _optionsRef$current$o, _optionsRef$current;
-
       ev.preventDefault();
       ev.persist();
       setIsHovering(false);
@@ -1363,7 +1274,7 @@ const useDrop = options => {
         data = JSON.parse(data);
       } catch (err) {}
 
-      (_optionsRef$current$o = (_optionsRef$current = optionsRef.current).onDrop) === null || _optionsRef$current$o === void 0 ? void 0 : _optionsRef$current$o.call(_optionsRef$current, data, ev);
+      optionsRef.current.onDrop(data, ev);
     },
     onDragEnter: ev => {
       ev.preventDefault();
@@ -1379,13 +1290,14 @@ const useDrop = options => {
   }];
 };
 
-const useDragableBox = ({
-  defaultWidth,
-  minWidth,
-  maxWidth,
-  target,
-  siderTarget
-}) => {
+const useDragableBox = options => {
+  const {
+    defaultWidth,
+    minWidth,
+    maxWidth,
+    target,
+    siderTarget
+  } = options;
   const {
     clientX
   } = useMouse();
@@ -1431,35 +1343,5 @@ const useDragableBox = ({
   };
 };
 
-const usePrevious = (state, compare) => {
-  const prevRef = useRef();
-  const curRef = useRef(state);
-  const shouldUpdate = typeof compare === 'function' ? compare(curRef.current, state) : true;
-
-  if (shouldUpdate) {
-    prevRef.current = curRef.current;
-    curRef.current = state;
-  }
-
-  return prevRef.current;
-};
-
-const useUnmount$1 = fn => {
-  const fnRef = useRef();
-  fnRef.current = fn;
-  useEffect(() => {
-    return fnRef.current;
-  }, []);
-};
-const useIsUnmounted$1 = () => {
-  const isUnmountedRef = useRef(false);
-  isUnmountedRef.current = false;
-  useUnmount$1(() => {
-    isUnmountedRef.current = true;
-  });
-  return isUnmountedRef.current;
-};
-const useIsMounted$1 = () => !useIsUnmounted$1();
-
-export { useCustomCompareEffect, useDebouncedValue, useDeepCompareEffect, useDocumentVisible, useDrag, useDragableBox, useDrop, useEventListener, useInterval, useIsMounted$1 as useIsMounted, useIsUnmounted$1 as useIsUnmounted, useMouse, useMutation, usePolling, usePrevious, useRequest, useShouldUpdateEffect, useSize, useTable, useThrottledValue, useTimeout, useUnmount$1 as useUnmount, useUpdateEffect };
+export { useCustomCompareEffect, useDebouncedValue, useDeepCompareEffect, useDrag, useDragableBox, useDrop, useEventListener, useFlag, useInterval, useIsMounted, useIsUnmounted, useLog, useMouse, useMutation, usePrevious, useRequest, useShouldUpdateEffect, useSize, useTable, useThrottledValue, useTimeout, useUnmount, useUpdateEffect };
 //# sourceMappingURL=index.modern.js.map
