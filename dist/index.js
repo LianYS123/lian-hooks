@@ -33,72 +33,6 @@ function _objectWithoutPropertiesLoose(source, excluded) {
   return target;
 }
 
-// A type of promise-like that resolves synchronously and supports only one observer
-
-const _iteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.iterator || (Symbol.iterator = Symbol("Symbol.iterator"))) : "@@iterator";
-
-const _asyncIteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.asyncIterator || (Symbol.asyncIterator = Symbol("Symbol.asyncIterator"))) : "@@asyncIterator";
-
-// Asynchronously call a function and send errors to recovery continuation
-function _catch(body, recover) {
-	try {
-		var result = body();
-	} catch(e) {
-		return recover(e);
-	}
-	if (result && result.then) {
-		return result.then(void 0, recover);
-	}
-	return result;
-}
-
-var useMutation = function useMutation(method, initialData) {
-  var _useState = react.useState(false),
-      loading = _useState[0],
-      setLoading = _useState[1];
-
-  var _useState2 = react.useState(),
-      error = _useState2[0],
-      setError = _useState2[1];
-
-  var _useState3 = react.useState(initialData),
-      data = _useState3[0],
-      setData = _useState3[1];
-
-  var methodRef = react.useRef(method);
-  methodRef.current = method;
-
-  var loadData = function loadData() {
-    for (var _len = arguments.length, params = new Array(_len), _key = 0; _key < _len; _key++) {
-      params[_key] = arguments[_key];
-    }
-
-    try {
-      var _temp2 = _catch(function () {
-        setLoading(true);
-        return Promise.resolve(methodRef.current.apply(methodRef, params)).then(function (res) {
-          setLoading(false);
-          setData(res);
-        });
-      }, function (e) {
-        setLoading(false);
-        setError(e);
-        console.error(e);
-      });
-
-      return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
-    } catch (e) {
-      return Promise.reject(e);
-    }
-  };
-
-  return [loadData, {
-    loading: loading,
-    error: error,
-    data: data
-  }];
-};
-
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 /**
@@ -1145,6 +1079,72 @@ var useFlag = function useFlag() {
   };
 };
 
+// A type of promise-like that resolves synchronously and supports only one observer
+
+const _iteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.iterator || (Symbol.iterator = Symbol("Symbol.iterator"))) : "@@iterator";
+
+const _asyncIteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.asyncIterator || (Symbol.asyncIterator = Symbol("Symbol.asyncIterator"))) : "@@asyncIterator";
+
+// Asynchronously call a function and send errors to recovery continuation
+function _catch(body, recover) {
+	try {
+		var result = body();
+	} catch(e) {
+		return recover(e);
+	}
+	if (result && result.then) {
+		return result.then(void 0, recover);
+	}
+	return result;
+}
+
+var useMutation = function useMutation(method, initialData) {
+  var _useState = react.useState(false),
+      loading = _useState[0],
+      setLoading = _useState[1];
+
+  var _useState2 = react.useState(),
+      error = _useState2[0],
+      setError = _useState2[1];
+
+  var _useState3 = react.useState(initialData),
+      data = _useState3[0],
+      setData = _useState3[1];
+
+  var methodRef = react.useRef(method);
+  methodRef.current = method;
+
+  var loadData = function loadData() {
+    for (var _len = arguments.length, params = new Array(_len), _key = 0; _key < _len; _key++) {
+      params[_key] = arguments[_key];
+    }
+
+    try {
+      var _temp2 = _catch(function () {
+        setLoading(true);
+        return Promise.resolve(methodRef.current.apply(methodRef, params)).then(function (res) {
+          setLoading(false);
+          setData(res);
+        });
+      }, function (e) {
+        setLoading(false);
+        setError(e);
+        console.error(e);
+      });
+
+      return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  return [loadData, {
+    loading: loading,
+    error: error,
+    data: data
+  }];
+};
+
 var useRequest = function useRequest(options) {
   var method = options.method,
       _options$defaultParam = options.defaultParams,
@@ -1204,77 +1204,25 @@ var defaultFormatter = function defaultFormatter(_temp) {
   };
 };
 
-var useTable = function useTable(options) {
-  var method = options.method,
-      _options$defaultPageS = options.defaultPageSize,
-      defaultPageSize = _options$defaultPageS === void 0 ? 10 : _options$defaultPageS,
-      _options$necessaryPar = options.necessaryParams,
-      necessaryParams = _options$necessaryPar === void 0 ? {} : _options$necessaryPar,
-      _options$formatter = options.formatter,
-      formatter = _options$formatter === void 0 ? defaultFormatter : _options$formatter,
-      customRowSelection = options.rowSelection,
-      rest = _objectWithoutPropertiesLoose(options, ["method", "defaultPageSize", "necessaryParams", "formatter", "rowSelection"]);
+var usePagination = function usePagination(_ref2) {
+  var defaultPageSize = _ref2.defaultPageSize,
+      total = _ref2.total;
 
   var _useState = react.useState({
     current: 1,
     pageSize: defaultPageSize
   }),
       _useState$ = _useState[0],
-      _useState$$current = _useState$.current,
-      current = _useState$$current === void 0 ? 1 : _useState$$current,
-      _useState$$pageSize = _useState$.pageSize,
-      pageSize = _useState$$pageSize === void 0 ? defaultPageSize : _useState$$pageSize,
+      current = _useState$.current,
+      pageSize = _useState$.pageSize,
       onChangePaination = _useState[1];
 
-  var _useState2 = react.useState([]),
-      selectedRowKeys = _useState2[0],
-      setSelectedRowKeys = _useState2[1];
-
-  var realParams = _extends({}, necessaryParams, {
-    page: current,
-    page_size: pageSize
-  });
-
-  var _useRequest = useRequest(_extends({
-    method: method,
-    necessaryParams: realParams
-  }, rest)),
-      data = _useRequest.data,
-      loading = _useRequest.loading,
-      search = _useRequest.search,
-      reload = _useRequest.reload;
-
-  var _formatter = formatter(data),
-      total = _formatter.total,
-      dataSource = _formatter.dataSource;
-
   var onChange = function onChange(current, pageSize) {
-    var toCurrent = current <= 0 ? 1 : current;
-    var toPageSize = pageSize <= 0 ? 1 : pageSize;
-    var tempTotalPage = Math.ceil(total / toPageSize);
-
-    if (tempTotalPage && toCurrent > tempTotalPage) {
-      toCurrent = tempTotalPage;
-    }
-
     onChangePaination({
-      current: toCurrent,
-      pageSize: toPageSize
+      current: current,
+      pageSize: pageSize
     });
   };
-
-  var rowSelection = customRowSelection || {
-    onChange: function onChange(selectedRowKeys) {
-      setSelectedRowKeys(selectedRowKeys);
-    },
-    selectedRowKeys: selectedRowKeys,
-    preserveSelectedRowKeys: true,
-    selections: false
-  };
-
-  if (customRowSelection && typeof customRowSelection === 'object') {
-    Object.assign(rowSelection, customRowSelection);
-  }
 
   var pagination = {
     current: current,
@@ -1283,19 +1231,96 @@ var useTable = function useTable(options) {
     onChange: onChange,
     onShowSizeChange: onChange
   };
-  return {
+  return pagination;
+};
+
+var useRowSelection = function useRowSelection(customConfig) {
+  var _useState2 = react.useState([]),
+      selectedRowKeys = _useState2[0],
+      setSelectedRowKeys = _useState2[1];
+
+  var _useState3 = react.useState(customConfig),
+      rowSelection = _useState3[0],
+      setRowSelection = _useState3[1];
+
+  var onChange = react.useCallback(function (keys) {
+    return setSelectedRowKeys(keys);
+  }, []);
+  useDeepCompareEffect(function () {
+    var baseSelection = {
+      selectedRowKeys: selectedRowKeys,
+      onChange: onChange,
+      preserveSelectedRowKeys: true,
+      selections: false
+    };
+
+    if (!customConfig) {
+      setRowSelection();
+    } else if (customConfig === true) {
+      setRowSelection(baseSelection);
+    } else {
+      setRowSelection(_extends({}, baseSelection, customConfig));
+    }
+  }, [selectedRowKeys, customConfig]);
+  return rowSelection;
+};
+
+var useTable = function useTable(options) {
+  var method = options.method,
+      _options$defaultPageS = options.defaultPageSize,
+      defaultPageSize = _options$defaultPageS === void 0 ? 10 : _options$defaultPageS,
+      _options$necessaryPar = options.necessaryParams,
+      necessaryParams = _options$necessaryPar === void 0 ? {} : _options$necessaryPar,
+      _options$formatter = options.formatter,
+      formatter = _options$formatter === void 0 ? defaultFormatter : _options$formatter,
+      customConfig = options.rowSelection,
+      rest = _objectWithoutPropertiesLoose(options, ["method", "defaultPageSize", "necessaryParams", "formatter", "rowSelection"]);
+
+  var _useState4 = react.useState(10),
+      total = _useState4[0],
+      setTotal = _useState4[1];
+
+  var _useState5 = react.useState([]),
+      dataSource = _useState5[0],
+      setSource = _useState5[1];
+
+  var pagination = usePagination({
+    total: total,
+    defaultPageSize: defaultPageSize
+  });
+  var rowSelection = useRowSelection(customConfig);
+
+  var _useRequest = useRequest(_extends({
+    method: method,
+    necessaryParams: _extends({}, necessaryParams, {
+      page: pagination.current,
+      page_size: pagination.pageSize
+    })
+  }, rest)),
+      data = _useRequest.data,
+      loading = _useRequest.loading,
+      restState = _objectWithoutPropertiesLoose(_useRequest, ["data", "loading"]);
+
+  react.useEffect(function () {
+    var _formatter = formatter(data),
+        total = _formatter.total,
+        dataSource = _formatter.dataSource;
+
+    setTotal(total);
+    setSource(dataSource);
+  }, [data]);
+  var tableProps = {
+    dataSource: dataSource,
+    loading: loading,
+    pagination: pagination,
+    rowSelection: rowSelection
+  };
+  return _extends({
     loading: loading,
     data: data,
-    reload: reload,
-    search: search,
     pagination: pagination,
-    tableProps: {
-      dataSource: dataSource,
-      loading: loading,
-      pagination: pagination,
-      rowSelection: rowSelection
-    }
-  };
+    tableProps: tableProps
+  }, restState);
 };
 
 function getTargetElement(target, defaultElement) {
@@ -1524,6 +1549,7 @@ exports.useIsUnmounted = useIsUnmounted;
 exports.useLog = useLog;
 exports.useMouse = useMouse;
 exports.useMutation = useMutation;
+exports.usePagination = usePagination;
 exports.usePrevious = usePrevious;
 exports.useRequest = useRequest;
 exports.useShouldUpdateEffect = useShouldUpdateEffect;

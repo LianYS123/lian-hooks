@@ -1,31 +1,37 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 
-const useMutation = (method, initialData) => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState();
-  const [data, setData] = useState(initialData);
-  const methodRef = useRef(method);
-  methodRef.current = method;
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
 
-  const loadData = async (...params) => {
-    try {
-      setLoading(true);
-      const res = await methodRef.current(...params);
-      setLoading(false);
-      setData(res);
-    } catch (e) {
-      setLoading(false);
-      setError(e);
-      console.error(e);
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
     }
+
+    return target;
   };
 
-  return [loadData, {
-    loading,
-    error,
-    data
-  }];
-};
+  return _extends.apply(this, arguments);
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -892,54 +898,90 @@ var fastDeepEqual = function equal(a, b) {
   return a!==a && b!==b;
 };
 
-const useInterval = (func, interval, deps = []) => {
-  const [timer, setTimer] = useState();
-  const funcRef = useRef(func);
+var useInterval = function useInterval(func, interval, deps) {
+  if (deps === void 0) {
+    deps = [];
+  }
+
+  var _useState = useState(),
+      timer = _useState[0],
+      setTimer = _useState[1];
+
+  var funcRef = useRef(func);
   funcRef.current = func;
 
-  const clear = () => clearInterval(timer);
+  var clear = function clear() {
+    return clearInterval(timer);
+  };
 
-  useEffect(() => {
-    const I = setInterval(() => {
+  useEffect(function () {
+    var I = setInterval(function () {
       funcRef.current();
     }, interval);
     setTimer(I);
-    return () => clearInterval(I);
+    return function () {
+      return clearInterval(I);
+    };
   }, deps);
   return clear;
 };
-const useTimeout = (func, timeout, deps = []) => {
-  const [timer, setTimer] = useState();
-  const funcRef = useRef(func);
+var useTimeout = function useTimeout(func, timeout, deps) {
+  if (deps === void 0) {
+    deps = [];
+  }
+
+  var _useState2 = useState(),
+      timer = _useState2[0],
+      setTimer = _useState2[1];
+
+  var funcRef = useRef(func);
   funcRef.current = func;
 
-  const clear = () => clearTimeout(timer);
+  var clear = function clear() {
+    return clearTimeout(timer);
+  };
 
-  useEffect(() => {
-    const T = setTimeout(funcRef.current, timeout);
+  useEffect(function () {
+    var T = setTimeout(funcRef.current, timeout);
     setTimer(T);
-    return () => clearTimeout(T);
+    return function () {
+      return clearTimeout(T);
+    };
   }, deps);
   return clear;
 };
-const useThrottledValue = (value, wait = 100) => {
-  const [throttledValue, setValue] = useState();
-  const setThrottledValue = useCallback(lodash_throttle(setValue, wait), []);
-  useEffect(() => {
+var useThrottledValue = function useThrottledValue(value, wait) {
+  if (wait === void 0) {
+    wait = 100;
+  }
+
+  var _useState3 = useState(),
+      throttledValue = _useState3[0],
+      setValue = _useState3[1];
+
+  var setThrottledValue = useCallback(lodash_throttle(setValue, wait), []);
+  useEffect(function () {
     setThrottledValue(value);
   }, [value]);
   return throttledValue;
 };
-const useDebouncedValue = (value, wait = 100) => {
-  const [debouncedValue, setValue] = useState();
-  const setThrottledValue = useCallback(lodash_debounce(setValue, wait), []);
-  useEffect(() => {
+var useDebouncedValue = function useDebouncedValue(value, wait) {
+  if (wait === void 0) {
+    wait = 100;
+  }
+
+  var _useState4 = useState(),
+      debouncedValue = _useState4[0],
+      setValue = _useState4[1];
+
+  var setThrottledValue = useCallback(lodash_debounce(setValue, wait), []);
+  useEffect(function () {
     setThrottledValue(value);
   }, [value]);
   return debouncedValue;
 };
-const useShouldUpdateEffect = (effect, deps, shouldUpdate) => {
-  const depsRef = useRef(deps);
+var useShouldUpdateEffect = function useShouldUpdateEffect(effect, deps, shouldUpdate) {
+  var depsRef = useRef(deps);
 
   if (shouldUpdate(depsRef.current, deps)) {
     depsRef.current = deps;
@@ -947,14 +989,22 @@ const useShouldUpdateEffect = (effect, deps, shouldUpdate) => {
 
   useEffect(effect, depsRef.current);
 };
-const useCustomCompareEffect = (effect, deps, compare) => useShouldUpdateEffect(effect, deps, (...args) => !compare(...args));
-const useDeepCompareEffect = (effect, deps = []) => {
+var useCustomCompareEffect = function useCustomCompareEffect(effect, deps, compare) {
+  return useShouldUpdateEffect(effect, deps, function () {
+    return !compare.apply(void 0, arguments);
+  });
+};
+var useDeepCompareEffect = function useDeepCompareEffect(effect, deps) {
+  if (deps === void 0) {
+    deps = [];
+  }
+
   return useCustomCompareEffect(effect, deps, fastDeepEqual);
 };
-const usePrevious = (state, compare) => {
-  const prevRef = useRef();
-  const curRef = useRef(state);
-  const shouldUpdate = typeof compare === 'function' ? compare(curRef.current, state) : true;
+var usePrevious = function usePrevious(state, compare) {
+  var prevRef = useRef();
+  var curRef = useRef(state);
+  var shouldUpdate = typeof compare === 'function' ? compare(curRef.current, state) : true;
 
   if (shouldUpdate) {
     prevRef.current = curRef.current;
@@ -963,9 +1013,9 @@ const usePrevious = (state, compare) => {
 
   return prevRef.current;
 };
-const useUpdateEffect = (fn, deps) => {
-  const isMouted = useRef(false);
-  useEffect(() => {
+var useUpdateEffect = function useUpdateEffect(fn, deps) {
+  var isMouted = useRef(false);
+  useEffect(function () {
     if (isMouted.current) {
       return fn();
     } else {
@@ -973,182 +1023,304 @@ const useUpdateEffect = (fn, deps) => {
     }
   }, deps);
 };
-const useUnmount = fn => {
-  const fnRef = useRef(fn);
+var useUnmount = function useUnmount(fn) {
+  var fnRef = useRef(fn);
   fnRef.current = fn;
-  useEffect(() => {
+  useEffect(function () {
     return fnRef.current;
   }, []);
 };
-const useIsUnmounted = () => {
-  const isUnmountedRef = useRef(false);
+var useIsUnmounted = function useIsUnmounted() {
+  var isUnmountedRef = useRef(false);
   isUnmountedRef.current = false;
-  useUnmount(() => {
+  useUnmount(function () {
     isUnmountedRef.current = true;
   });
   return isUnmountedRef.current;
 };
-const useIsMounted = () => !useIsUnmounted();
-const useLog = (...args) => {
-  useEffect(() => {
-    console.log(...args);
+var useIsMounted = function useIsMounted() {
+  return !useIsUnmounted();
+};
+var useLog = function useLog() {
+  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  useEffect(function () {
+    var _console;
+
+    (_console = console).log.apply(_console, args);
   }, args);
 };
-const useFlag = () => {
-  const [flag, setFlag] = useState(false);
+var useFlag = function useFlag() {
+  var _useState5 = useState(false),
+      flag = _useState5[0],
+      setFlag = _useState5[1];
 
-  const setTrue = () => setFlag(true);
+  var setTrue = function setTrue() {
+    return setFlag(true);
+  };
 
-  const setFalse = () => setFlag(false);
+  var setFalse = function setFalse() {
+    return setFlag(false);
+  };
 
-  const toggle = () => setFlag(f => !f);
+  var toggle = function toggle() {
+    return setFlag(function (f) {
+      return !f;
+    });
+  };
 
   return {
-    flag,
-    setTrue,
-    setFalse,
-    toggle
+    flag: flag,
+    setTrue: setTrue,
+    setFalse: setFalse,
+    toggle: toggle
   };
 };
 
-const useRequest = options => {
-  const {
-    method,
-    defaultParams = {},
-    necessaryParams,
-    ready = true,
-    initialData,
-    ...rest
-  } = options;
-  const [_method, requestState] = useMutation(method, initialData);
-  const paramRef = useRef(defaultParams);
-  const necessaryParamsRef = useRef(necessaryParams);
+// A type of promise-like that resolves synchronously and supports only one observer
+
+const _iteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.iterator || (Symbol.iterator = Symbol("Symbol.iterator"))) : "@@iterator";
+
+const _asyncIteratorSymbol = /*#__PURE__*/ typeof Symbol !== "undefined" ? (Symbol.asyncIterator || (Symbol.asyncIterator = Symbol("Symbol.asyncIterator"))) : "@@asyncIterator";
+
+// Asynchronously call a function and send errors to recovery continuation
+function _catch(body, recover) {
+	try {
+		var result = body();
+	} catch(e) {
+		return recover(e);
+	}
+	if (result && result.then) {
+		return result.then(void 0, recover);
+	}
+	return result;
+}
+
+var useMutation = function useMutation(method, initialData) {
+  var _useState = useState(false),
+      loading = _useState[0],
+      setLoading = _useState[1];
+
+  var _useState2 = useState(),
+      error = _useState2[0],
+      setError = _useState2[1];
+
+  var _useState3 = useState(initialData),
+      data = _useState3[0],
+      setData = _useState3[1];
+
+  var methodRef = useRef(method);
+  methodRef.current = method;
+
+  var loadData = function loadData() {
+    for (var _len = arguments.length, params = new Array(_len), _key = 0; _key < _len; _key++) {
+      params[_key] = arguments[_key];
+    }
+
+    try {
+      var _temp2 = _catch(function () {
+        setLoading(true);
+        return Promise.resolve(methodRef.current.apply(methodRef, params)).then(function (res) {
+          setLoading(false);
+          setData(res);
+        });
+      }, function (e) {
+        setLoading(false);
+        setError(e);
+        console.error(e);
+      });
+
+      return Promise.resolve(_temp2 && _temp2.then ? _temp2.then(function () {}) : void 0);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  return [loadData, {
+    loading: loading,
+    error: error,
+    data: data
+  }];
+};
+
+var useRequest = function useRequest(options) {
+  var method = options.method,
+      _options$defaultParam = options.defaultParams,
+      defaultParams = _options$defaultParam === void 0 ? {} : _options$defaultParam,
+      necessaryParams = options.necessaryParams,
+      _options$ready = options.ready,
+      ready = _options$ready === void 0 ? true : _options$ready,
+      initialData = options.initialData,
+      rest = _objectWithoutPropertiesLoose(options, ["method", "defaultParams", "necessaryParams", "ready", "initialData"]);
+
+  var _useMutation = useMutation(method, initialData),
+      _method = _useMutation[0],
+      requestState = _useMutation[1];
+
+  var paramRef = useRef(defaultParams);
+  var necessaryParamsRef = useRef(necessaryParams);
   necessaryParamsRef.current = necessaryParams;
 
-  const loadData = (_params = paramRef.current) => {
+  var loadData = function loadData(_params) {
+    if (_params === void 0) {
+      _params = paramRef.current;
+    }
+
     paramRef.current = _params;
 
     if (!requestState.loading) {
-      const realParams = { ...necessaryParamsRef.current,
-        ..._params
-      };
+      var realParams = _extends({}, necessaryParamsRef.current, _params);
 
       _method(realParams, rest);
     }
   };
 
-  const reload = () => {
+  var reload = function reload() {
     loadData();
   };
 
-  useDeepCompareEffect(() => {
+  useDeepCompareEffect(function () {
     if (ready === true) {
       loadData();
     }
   }, [necessaryParams, ready]);
-  return {
+  return _extends({
     search: loadData,
-    reload,
-    params: { ...necessaryParamsRef.current,
-      ...paramRef.current
-    },
-    ...requestState
-  };
+    reload: reload,
+    params: _extends({}, necessaryParamsRef.current, paramRef.current)
+  }, requestState);
 };
 
-const defaultFormatter = ({
-  data: _data = []
-} = {}) => {
+var defaultFormatter = function defaultFormatter(_temp) {
+  var _ref = _temp === void 0 ? {} : _temp,
+      _ref$data = _ref.data,
+      data = _ref$data === void 0 ? [] : _ref$data;
+
   return {
-    total: _data.length,
-    dataSource: _data
+    total: data.length,
+    dataSource: data
   };
 };
 
-const useTable = options => {
-  const {
-    method,
-    defaultPageSize = 10,
-    necessaryParams = {},
-    formatter = defaultFormatter,
-    rowSelection: customRowSelection,
-    ...rest
-  } = options;
-  const [{
-    current = 1,
-    pageSize = defaultPageSize
-  }, onChangePaination] = useState({
+var usePagination = function usePagination(_ref2) {
+  var defaultPageSize = _ref2.defaultPageSize,
+      total = _ref2.total;
+
+  var _useState = useState({
     current: 1,
     pageSize: defaultPageSize
-  });
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const realParams = { ...necessaryParams,
-    page: current,
-    page_size: pageSize
-  };
-  const {
-    data,
-    loading,
-    search,
-    reload
-  } = useRequest({
-    method,
-    necessaryParams: realParams,
-    ...rest
-  });
-  const {
-    total,
-    dataSource
-  } = formatter(data);
+  }),
+      _useState$ = _useState[0],
+      current = _useState$.current,
+      pageSize = _useState$.pageSize,
+      onChangePaination = _useState[1];
 
-  const onChange = (current, pageSize) => {
-    let toCurrent = current <= 0 ? 1 : current;
-    const toPageSize = pageSize <= 0 ? 1 : pageSize;
-    const tempTotalPage = Math.ceil(total / toPageSize);
-
-    if (tempTotalPage && toCurrent > tempTotalPage) {
-      toCurrent = tempTotalPage;
-    }
-
+  var onChange = function onChange(current, pageSize) {
     onChangePaination({
-      current: toCurrent,
-      pageSize: toPageSize
+      current: current,
+      pageSize: pageSize
     });
   };
 
-  const rowSelection = customRowSelection || {
-    onChange: selectedRowKeys => {
-      setSelectedRowKeys(selectedRowKeys);
-    },
-    selectedRowKeys,
-    preserveSelectedRowKeys: true,
-    selections: false
-  };
-
-  if (customRowSelection && typeof customRowSelection === 'object') {
-    Object.assign(rowSelection, customRowSelection);
-  }
-
-  const pagination = {
-    current,
-    pageSize,
-    total,
+  var pagination = {
+    current: current,
+    pageSize: pageSize,
+    total: total,
     onChange: onChange,
     onShowSizeChange: onChange
   };
-  return {
-    loading,
-    data,
-    reload,
-    search,
-    pagination,
-    tableProps: {
-      dataSource,
-      loading,
-      pagination,
-      rowSelection
+  return pagination;
+};
+
+var useRowSelection = function useRowSelection(customConfig) {
+  var _useState2 = useState([]),
+      selectedRowKeys = _useState2[0],
+      setSelectedRowKeys = _useState2[1];
+
+  var _useState3 = useState(customConfig),
+      rowSelection = _useState3[0],
+      setRowSelection = _useState3[1];
+
+  var onChange = useCallback(function (keys) {
+    return setSelectedRowKeys(keys);
+  }, []);
+  useDeepCompareEffect(function () {
+    var baseSelection = {
+      selectedRowKeys: selectedRowKeys,
+      onChange: onChange,
+      preserveSelectedRowKeys: true,
+      selections: false
+    };
+
+    if (!customConfig) {
+      setRowSelection();
+    } else if (customConfig === true) {
+      setRowSelection(baseSelection);
+    } else {
+      setRowSelection(_extends({}, baseSelection, customConfig));
     }
+  }, [selectedRowKeys, customConfig]);
+  return rowSelection;
+};
+
+var useTable = function useTable(options) {
+  var method = options.method,
+      _options$defaultPageS = options.defaultPageSize,
+      defaultPageSize = _options$defaultPageS === void 0 ? 10 : _options$defaultPageS,
+      _options$necessaryPar = options.necessaryParams,
+      necessaryParams = _options$necessaryPar === void 0 ? {} : _options$necessaryPar,
+      _options$formatter = options.formatter,
+      formatter = _options$formatter === void 0 ? defaultFormatter : _options$formatter,
+      customConfig = options.rowSelection,
+      rest = _objectWithoutPropertiesLoose(options, ["method", "defaultPageSize", "necessaryParams", "formatter", "rowSelection"]);
+
+  var _useState4 = useState(10),
+      total = _useState4[0],
+      setTotal = _useState4[1];
+
+  var _useState5 = useState([]),
+      dataSource = _useState5[0],
+      setSource = _useState5[1];
+
+  var pagination = usePagination({
+    total: total,
+    defaultPageSize: defaultPageSize
+  });
+  var rowSelection = useRowSelection(customConfig);
+
+  var _useRequest = useRequest(_extends({
+    method: method,
+    necessaryParams: _extends({}, necessaryParams, {
+      page: pagination.current,
+      page_size: pagination.pageSize
+    })
+  }, rest)),
+      data = _useRequest.data,
+      loading = _useRequest.loading,
+      restState = _objectWithoutPropertiesLoose(_useRequest, ["data", "loading"]);
+
+  useEffect(function () {
+    var _formatter = formatter(data),
+        total = _formatter.total,
+        dataSource = _formatter.dataSource;
+
+    setTotal(total);
+    setSource(dataSource);
+  }, [data]);
+  var tableProps = {
+    dataSource: dataSource,
+    loading: loading,
+    pagination: pagination,
+    rowSelection: rowSelection
   };
+  return _extends({
+    loading: loading,
+    data: data,
+    pagination: pagination,
+    tableProps: tableProps
+  }, restState);
 };
 
 function getTargetElement(target, defaultElement) {
@@ -1156,7 +1328,7 @@ function getTargetElement(target, defaultElement) {
     return defaultElement;
   }
 
-  let targetElement;
+  var targetElement;
 
   if (typeof target === 'function') {
     targetElement = target();
@@ -1169,11 +1341,11 @@ function getTargetElement(target, defaultElement) {
   return targetElement;
 }
 
-const useEventListener = (target, eventName, listener) => {
-  const listenerRef = useRef(listener);
+var useEventListener = function useEventListener(target, eventName, listener) {
+  var listenerRef = useRef(listener);
   listenerRef.current = listener;
-  useEffect(() => {
-    const targetElement = getTargetElement(target, window);
+  useEffect(function () {
+    var targetElement = getTargetElement(target, window);
 
     if (!(targetElement !== null && targetElement !== void 0 && targetElement.addEventListener)) {
       return;
@@ -1183,13 +1355,15 @@ const useEventListener = (target, eventName, listener) => {
     return targetElement.removeEventListener.bind(targetElement, eventName, listenerRef.current);
   }, [eventName, target]);
 };
-const useSize = ref => {
-  const [size, setSize] = useState({
+var useSize = function useSize(ref) {
+  var _useState = useState({
     width: 0,
     height: 0
-  });
+  }),
+      size = _useState[0],
+      setSize = _useState[1];
 
-  const _setSize = () => {
+  var _setSize = function _setSize() {
     setSize({
       width: ref.current ? ref.current.clientWidth : 0,
       height: ref.current ? ref.current.clientHeight : 0
@@ -1197,12 +1371,12 @@ const useSize = ref => {
   };
 
   useEventListener(window, 'resize', _setSize);
-  useEffect(() => {
+  useEffect(function () {
     _setSize();
   }, []);
   return size;
 };
-const defaultMouseAttribute = {
+var defaultMouseAttribute = {
   pageX: NaN,
   pageY: NaN,
   screenX: NaN,
@@ -1212,108 +1386,124 @@ const defaultMouseAttribute = {
   clientX: NaN,
   clientY: NaN
 };
-const useMouse = () => {
-  const [attr, setAttr] = useState(defaultMouseAttribute);
-  useEventListener(window, 'mousemove', ev => {
-    const {
-      pageX,
-      pageY,
-      screenX,
-      screenY,
-      x,
-      y,
-      clientX,
-      clientY
-    } = ev;
+var useMouse = function useMouse() {
+  var _useState2 = useState(defaultMouseAttribute),
+      attr = _useState2[0],
+      setAttr = _useState2[1];
+
+  useEventListener(window, 'mousemove', function (ev) {
+    var pageX = ev.pageX,
+        pageY = ev.pageY,
+        screenX = ev.screenX,
+        screenY = ev.screenY,
+        x = ev.x,
+        y = ev.y,
+        clientX = ev.clientX,
+        clientY = ev.clientY;
     setAttr({
-      pageX,
-      pageY,
-      screenX,
-      screenY,
-      x,
-      y,
-      clientX,
-      clientY
+      pageX: pageX,
+      pageY: pageY,
+      screenX: screenX,
+      screenY: screenY,
+      x: x,
+      y: y,
+      clientX: clientX,
+      clientY: clientY
     });
   });
   return attr;
 };
 
-const useDrag = (config = {}) => {
-  const {
-    onDragStart,
-    onDragEnd
-  } = config;
-  return data => ({
-    draggable: 'true',
-    key: JSON.stringify(data),
-    onDragStart: ev => {
-      ev.dataTransfer.setData('custom', JSON.stringify(data));
-      onDragStart && onDragStart(data, ev);
-    },
-    onDragEnd: ev => {
-      onDragEnd && onDragEnd(data, ev);
-    }
-  });
+var useDrag = function useDrag(config) {
+  if (config === void 0) {
+    config = {};
+  }
+
+  var _config = config,
+      _onDragStart = _config.onDragStart,
+      _onDragEnd = _config.onDragEnd;
+  return function (data) {
+    return {
+      draggable: 'true',
+      key: JSON.stringify(data),
+      onDragStart: function onDragStart(ev) {
+        ev.dataTransfer.setData('custom', JSON.stringify(data));
+        _onDragStart && _onDragStart(data, ev);
+      },
+      onDragEnd: function onDragEnd(ev) {
+        _onDragEnd && _onDragEnd(data, ev);
+      }
+    };
+  };
 };
-const useDrop = options => {
-  const [isHovering, setIsHovering] = useState(false);
-  const optionsRef = useRef(options);
+var useDrop = function useDrop(options) {
+  var _useState = useState(false),
+      isHovering = _useState[0],
+      setIsHovering = _useState[1];
+
+  var optionsRef = useRef(options);
   optionsRef.current = options;
-  const props = useMemo(() => ({
-    onDragOver: ev => {
-      ev.preventDefault();
-    },
-    onDrop: ev => {
-      ev.preventDefault();
-      ev.persist();
-      setIsHovering(false);
-      let data = ev.dataTransfer.getData('custom');
+  var props = useMemo(function () {
+    return {
+      onDragOver: function onDragOver(ev) {
+        ev.preventDefault();
+      },
+      onDrop: function onDrop(ev) {
+        ev.preventDefault();
+        ev.persist();
+        setIsHovering(false);
+        var data = ev.dataTransfer.getData('custom');
 
-      try {
-        data = JSON.parse(data);
-      } catch (err) {}
+        try {
+          data = JSON.parse(data);
+        } catch (err) {}
 
-      optionsRef.current.onDrop(data, ev);
-    },
-    onDragEnter: ev => {
-      ev.preventDefault();
-      setIsHovering(true);
-    },
-    onDragLeave: ev => {
-      ev.preventDefault();
-      setIsHovering(false);
-    }
-  }), [setIsHovering]);
+        optionsRef.current.onDrop(data, ev);
+      },
+      onDragEnter: function onDragEnter(ev) {
+        ev.preventDefault();
+        setIsHovering(true);
+      },
+      onDragLeave: function onDragLeave(ev) {
+        ev.preventDefault();
+        setIsHovering(false);
+      }
+    };
+  }, [setIsHovering]);
   return [props, {
-    isHovering
+    isHovering: isHovering
   }];
 };
 
-const useDragableBox = options => {
-  const {
-    defaultWidth,
-    minWidth,
-    maxWidth,
-    target,
-    siderTarget
-  } = options;
-  const {
-    clientX
-  } = useMouse();
-  const [width, setWidth] = useState(defaultWidth);
-  const [isDragging, setIsDragging] = useState(false);
-  useEffect(() => {
-    const box = getTargetElement(target);
+var useDragableBox = function useDragableBox(options) {
+  var defaultWidth = options.defaultWidth,
+      minWidth = options.minWidth,
+      maxWidth = options.maxWidth,
+      target = options.target,
+      siderTarget = options.siderTarget;
+
+  var _useMouse = useMouse(),
+      clientX = _useMouse.clientX;
+
+  var _useState = useState(defaultWidth),
+      width = _useState[0],
+      setWidth = _useState[1];
+
+  var _useState2 = useState(false),
+      isDragging = _useState2[0],
+      setIsDragging = _useState2[1];
+
+  useEffect(function () {
+    var box = getTargetElement(target);
 
     if (!box.getBoundingClientRect) {
       return;
     }
 
-    const {
-      left
-    } = box.getBoundingClientRect() || {};
-    let newWidth = clientX - left;
+    var _ref = box.getBoundingClientRect() || {},
+        left = _ref.left;
+
+    var newWidth = clientX - left;
     newWidth = Math.max(minWidth, newWidth);
     newWidth = Math.min(maxWidth, newWidth);
 
@@ -1321,27 +1511,29 @@ const useDragableBox = options => {
       setWidth(newWidth);
     }
   }, [target, clientX, isDragging, maxWidth, minWidth, setWidth, siderTarget]);
-  useEffect(() => {
+  useEffect(function () {
     document.body.style.cursor = isDragging ? 'col-resize' : '';
 
-    document.onselectstart = () => !isDragging;
+    document.onselectstart = function () {
+      return !isDragging;
+    };
 
-    return () => {
+    return function () {
       document.body.style.cursor = '';
       document.onselectstart = null;
     };
   }, [isDragging]);
-  useEventListener(window, 'mouseup', () => {
+  useEventListener(window, 'mouseup', function () {
     setIsDragging(false);
   });
-  useEventListener(siderTarget, 'mousedown', () => {
+  useEventListener(siderTarget, 'mousedown', function () {
     setIsDragging(true);
   });
   return {
-    width,
-    isDragging
+    width: width,
+    isDragging: isDragging
   };
 };
 
-export { useCustomCompareEffect, useDebouncedValue, useDeepCompareEffect, useDrag, useDragableBox, useDrop, useEventListener, useFlag, useInterval, useIsMounted, useIsUnmounted, useLog, useMouse, useMutation, usePrevious, useRequest, useShouldUpdateEffect, useSize, useTable, useThrottledValue, useTimeout, useUnmount, useUpdateEffect };
+export { useCustomCompareEffect, useDebouncedValue, useDeepCompareEffect, useDrag, useDragableBox, useDrop, useEventListener, useFlag, useInterval, useIsMounted, useIsUnmounted, useLog, useMouse, useMutation, usePagination, usePrevious, useRequest, useShouldUpdateEffect, useSize, useTable, useThrottledValue, useTimeout, useUnmount, useUpdateEffect };
 //# sourceMappingURL=index.modern.js.map
