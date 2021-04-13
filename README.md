@@ -1,200 +1,297 @@
-# lian-hooks 配置
+## Constants
 
-## 安装
+<dl>
+<dt><a href="#useEventListener">useEventListener</a></dt>
+<dd></dd>
+<dt><a href="#useSize">useSize</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useMouse">useMouse</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useDrag">useDrag</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useDrop">useDrop</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useDragableBox">useDragableBox</a> ⇒ <code>object</code></dt>
+<dd></dd>
+<dt><a href="#useMutation">useMutation</a> ⇒ <code>array</code></dt>
+<dd></dd>
+<dt><a href="#useRequest">useRequest</a></dt>
+<dd></dd>
+<dt><a href="#usePagination">usePagination</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useTable">useTable</a></dt>
+<dd></dd>
+<dt><a href="#useInterval">useInterval</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useTimeout">useTimeout</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useThrottledValue">useThrottledValue</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useDebouncedValue">useDebouncedValue</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useShouldUpdateEffect">useShouldUpdateEffect</a></dt>
+<dd></dd>
+<dt><a href="#useCustomCompareEffect">useCustomCompareEffect</a></dt>
+<dd></dd>
+<dt><a href="#useDeepCompareEffect">useDeepCompareEffect</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#usePrevious">usePrevious</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useUpdateEffect">useUpdateEffect</a></dt>
+<dd></dd>
+<dt><a href="#useUnmount">useUnmount</a></dt>
+<dd></dd>
+<dt><a href="#useIsUnmounted">useIsUnmounted</a> ⇒ <code>*</code></dt>
+<dd></dd>
+<dt><a href="#useIsMounted">useIsMounted</a> ⇒ <code>*</code></dt>
+<dd></dd>
+</dl>
 
-```bash
-$ npm install lian-hooks --save-dev
-```
+<a name="useEventListener"></a>
 
-## 组件说明
+## useEventListener
+**Kind**: global constant  
+**Description:**: 在hooks中使用事件监听器  
 
-- useTable 请求表格常用逻辑封装
-- useMutation 获取异步请求状态逻辑封装
-- usePolling 轮询逻辑封装
-- 其他：一些操作 dom 状态、定时器等 hooks 封装
+| Param | Type | Description |
+| --- | --- | --- |
+| target | <code>\*</code> | dom对象或其ref引用 |
+| eventName | <code>\*</code> | 事件名称 |
+| listener | <code>\*</code> | 事件监听器 |
 
-## 使用方法
+<a name="useSize"></a>
 
-见 demo
+## useSize ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - {width, height}  
+**Description:**: 监听元素大小变化  
 
-## 参数说明
+| Param | Description |
+| --- | --- |
+| ref | 元素ref引用 |
 
-### useTable 参数说明
+<a name="useMouse"></a>
 
-#### Params
+## useMouse ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - 鼠标位置信息  
+**Description:**: 获取鼠标位置信息  
+<a name="useDrag"></a>
 
-| 参数            | 说明                                       | 类型                                                | 默认值           |
-| :-------------- | :----------------------------------------- | :-------------------------------------------------- | :--------------- |
-| method          | 请求方法                                   | Function                                            | 无               |
-| defaultPageSize | 默认分页大小                               | number                                              | 10               |
-| defaultParams   | 默认请求参数                               | json                                                | 无               |
-| necessaryParams | 必要请求参数                               | json                                                | 无               |
-| formatter       | 请求结果数据转换函数                       | (data: any) => ({ total: number, dataSource: any }) | defaultFormatter |
-| autoStart       | 是否自动请求一次                           | boolean                                             | true             |
-| rowSelection    | 选项框属性，为 true 时展示默认选项框       | boolean/object                                      | 无               |
-| getAllKeys      | 用于勾选所有数据操作时获取 selectedRowKeys | () => Promise                                       | 无               |
+## useDrag ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - 一个获取拖拽属性的函数，入参为拖拽传输的数据  
+**Description:**: 获取可以被拖拽的元素属性  
 
-#### Result
+| Param | Type | Description |
+| --- | --- | --- |
+| config | <code>Object</code> | 拖拽开始执行的函数, 拖拽结束执行的函数 |
 
-| 属性       | 说明                       | 类型                                                   |
-| :--------- | :------------------------- | :----------------------------------------------------- |
-| loading    | 加载状态                   | boolean                                                |
-| data       | 请求返回的原始数据         | Object                                                 |
-| reload     | 使用上次的参数重新发起请求 | () => Promise                                          |
-| search     | 使用指定参数搜索           | () => Promise                                          |
-| pagination | 分页属性                   | {current, pageSize, total, onChange, onShowSizeChange} |
-| tableProps | antd 的 table 属性         | {dataSource, loading, pagination}                      |
+<a name="useDrop"></a>
 
-#### defaultFomatter
+## useDrop ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - 释放元素属性  
+**Description:**: 获取接收被拖拽内容的元素的属性  
+<a name="useDragableBox"></a>
 
-```js
-const defaultFormatter = (data: { content?: any } = {}) => {
-  const { total_records = 0, records = [] } = data.content || {};
-  return { total: total_records, dataSource: records };
-};
-```
+## useDragableBox ⇒ <code>object</code>
+**Kind**: global constant  
+**Returns**: <code>object</code> - 包含宽度和拖拽状态的对象  
+**Description:**: 拉伸容器  
 
-### useMutation 参数说明
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>object</code> |  |
+| options.defaultWidth | <code>number</code> | 默认宽度 |
+| options.minWidth | <code>number</code> | 最小宽度 |
+| options.maxWidth | <code>number</code> | 最大宽度 |
+| options.target | <code>\*</code> | 被拉伸的容器 |
+| options.siderTarget | <code>\*</code> | 用于拉伸的边缘 |
 
-| 参数        | 说明     | 类型     | 默认值 |
-| :---------- | :------- | :------- | :----- |
-| method      | 请求方法 | Function | 无     |
-| initialData | 初始数据 | Object   | 无     |
+<a name="useMutation"></a>
 
-#### Result
+## useMutation ⇒ <code>array</code>
+**Kind**: global constant  
+**Returns**: <code>array</code> - 异步方法和状态信息  
+**Description:**: 异步方法的简单封装，处理请求的loading状态  
 
-| 属性     | 说明                 | 类型     |
-| :------- | :------------------- | :------- |
-| loadData | 请求函数             | Function |
-| loading  | 加载状态             | boolean  |
-| error    | 发生错误时的错误对象 | Object   |
-| data     | 请求返回的原始数据   | Object   |
+| Param | Type | Description |
+| --- | --- | --- |
+| method | <code>function</code> | 异步方法 |
+| [initialData] | <code>Object</code> | 初始数据 |
 
-### useRequest 参数说明
+<a name="useRequest"></a>
 
-#### Params
+## useRequest
+**Kind**: global constant  
+**Description:**: 请求方法的简单封装，处理请求的loading状态  
 
-| 参数            | 说明                                           | 类型     | 默认值 |
-| :-------------- | :--------------------------------------------- | :------- | :----- |
-| method          | 请求方法                                       | Function | 无     |
-| defaultParams   | 默认请求参数                                   | json     | 无     |
-| necessaryParams | 必要请求参数                                   | json     | 无     |
-| autoLoad        | 自动请求, 为 true 时当必要参数变化时会发起请求 | boolean  | true   |
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>object</code> | 配置 |
+| options.method | <code>\*</code> | 请求方法 |
+| [options.defaultParams] | <code>\*</code> | 默认参数 |
+| [options.necessaryParams] | <code>\*</code> | 必要参数 |
+| [options.ready] | <code>\*</code> | === true时发起请求，默认值为true |
+| [options.initialData] | <code>\*</code> | 初始数据 |
+| [options.rest] | <code>\*</code> | 请求方法额外参数, onError事件等options可以通过这个参数传递 |
 
-#### Result
+<a name="usePagination"></a>
 
-| 属性    | 说明                       | 类型          |
-| :------ | :------------------------- | :------------ |
-| reload  | 使用上次的参数重新发起请求 | () => Promise |
-| search  | 使用指定参数搜索           | () => Promise |
-| loading | 加载状态                   | boolean       |
-| error   | 发生错误时的错误对象       | Object        |
-| data    | 请求返回的原始数据         | Object        |
+## usePagination ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - pagination  
+**Description:**: 处理分页状态的hooks  
 
-### usePolling 参数说明
+| Param | Type | Description |
+| --- | --- | --- |
+| config | <code>Object</code> |  |
+| config.defaultPageSize | <code>\*</code> | 默认分页大小 |
+| config.total | <code>\*</code> | 总数据条数 |
 
-#### Params
+<a name="useTable"></a>
 
-| 参数            | 说明                                             | 类型     | 默认值 |
-| :-------------- | :----------------------------------------------- | :------- | :----- |
-| method          | 请求方法                                         | Function | 无     |
-| autoStart       | 是否自动开启轮询                                 | boolean  | true   |
-| onReceive       | 当接收到数据时调用的函数, 返回 true 不再继续请求 | Function | 无     |
-| interval        | 请求间隔（毫秒）                                 | number   | 1000   |
-| errorRetryCount | 发生错误后继续请求次数                           | number   | 0      |
-| pollingWhenHidden | 页面隐藏时是否继续请求                           | boolean   | false      |
+## useTable
+**Kind**: global constant  
+**Description:**: 封装方便antd table使用的hooks  
 
-#### Result
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| options | <code>Object</code> |  | 配置信息 |
+| options.method | <code>function</code> |  | 请求方法 |
+| [options.defaultPageSize] | <code>Number</code> | <code>10</code> | 默认分页大小 |
+| [options.necessaryParams] | <code>Object</code> |  | 必要请求参数 |
+| [options.rowSelection] | <code>Object</code> \| <code>Boolean</code> |  | 选择功能配置, 传true使用默认 |
+| [options.formatter] | <code>function</code> |  | 请求结果数据转换函数, 返回{total, dataSource} |
 
-| 属性    | 说明                       | 类型       |
-| :------ | :------------------------- | :--------- |
-| start   | 使用上次的参数重新发起请求 | () => void |
-| cancel  | 使用指定参数搜索           | () => void |
-| loading | 加载状态                   | boolean    |
-| polling | 轮询状态，是否正在轮询中   | boolean    |
-| error   | 发生错误时的错误对象       | Error      |
-| data    | 请求返回的原始数据         | Object     |
+<a name="useInterval"></a>
 
-### useInterval
+## useInterval ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - clearInterval  
+**Description:**: setInterval的hooks实现  
 
-#### Params
+| Param | Type | Description |
+| --- | --- | --- |
+| func | <code>function</code> | 要执行的函数 |
+| interval | <code>number</code> | 执行间隔 |
+| deps | <code>Array</code> | 依赖项 |
 
-| 参数     | 说明         | 类型     | 默认值 |
-| :------- | :----------- | :------- | :----- |
-| func     | 要执行的函数 | Function | 无     |
-| interval | 执行间隔     | number   | 无     |
-| deps     | 执行依赖项   | any[]    | 无     |
+<a name="useTimeout"></a>
 
-### useTimeout
+## useTimeout ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - clearTimeout  
+**Description:**: setTimeout的hooks实现  
 
-#### Params
+| Param | Type | Description |
+| --- | --- | --- |
+| func | <code>function</code> | 要执行的函数 |
+| timeout | <code>number</code> | 执行间隔 |
+| deps | <code>Array</code> | 依赖项 |
 
-| 参数    | 说明         | 类型     | 默认值 |
-| :------ | :----------- | :------- | :----- |
-| func    | 要执行的函数 | Function | 无     |
-| timeout | 执行间隔     | number   | 无     |
-| deps    | 执行依赖项   | any[]    | 无     |
+<a name="useThrottledValue"></a>
 
-### useUpdateEffect
+## useThrottledValue ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - 放缓变化的值  
+**Description:**: 放缓获取value的速率（节流）  
 
-#### Params
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>\*</code> | 要节流的值 |
+| wait | <code>\*</code> | 节流时间间隔 |
 
-| 参数 | 说明         | 类型     | 默认值 |
-| :--- | :----------- | :------- | :----- |
-| func | 要执行的函数 | Function | 无     |
-| deps | 执行依赖项   | any[]    | 无     |
+<a name="useDebouncedValue"></a>
 
-### useEventListener
+## useDebouncedValue ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - 处理后的值  
+**Description:**: 合并一定时间内多次获取value的值（防抖）  
 
-#### Params
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>\*</code> | 要节流的值 |
+| wait | <code>\*</code> | 节流时间间隔 |
 
-| 参数      | 说明                  | 类型            | 默认值 |
-| :-------- | :-------------------- | :-------------- | :----- |
-| target    | dom 对象或其 ref 引用 | Object          | 无     |
-| eventName | 事件名称              | string          | 无     |
-| listener  | 事件监听器            | Function/Object | 无     |
+<a name="useShouldUpdateEffect"></a>
 
-### useSize
+## useShouldUpdateEffect
+**Kind**: global constant  
+**Description:**: 自定义useEffect的更新逻辑  
 
-#### Params
+| Param | Type | Description |
+| --- | --- | --- |
+| effect | <code>\*</code> | 作用 |
+| deps | <code>\*</code> | 依赖 |
+| shouldUpdate | <code>\*</code> | 是否执行作用，返回true执行effect |
 
-| 参数 | 说明                | 类型   | 默认值 |
-| :--- | :------------------ | :----- | :----- |
-| ref  | dom 对象的 ref 引用 | Object | 无     |
+<a name="useCustomCompareEffect"></a>
 
-#### Result
+## useCustomCompareEffect
+**Kind**: global constant  
+**Description:**: 自定义useEffect的依赖比较逻辑  
 
-| 属性   | 说明       | 类型   |
-| :----- | :--------- | :----- |
-| width  | 元素的宽度 | number |
-| height | 元素的高度 | number |
+| Param | Type | Description |
+| --- | --- | --- |
+| effect | <code>\*</code> | 作用 |
+| deps | <code>\*</code> | 依赖 |
+| compare | <code>\*</code> | 自定义比较函数 |
 
-### useDrag、useDrop
+<a name="useDeepCompareEffect"></a>
 
-#### useDrag Params
-| 参数 | 说明                | 类型   | 默认值 |
-| :--- | :------------------ | :----- | :----- |
-| onDragStart  | 拖拽开始执行的函数 | function | 无     |
-| onDragEnd  | 拖拽结束执行的函数 | function | 无     |
+## useDeepCompareEffect ⇒ <code>\*</code>
+**Kind**: global constant  
+**Description:**: 使用深比较的useEffect  
 
-#### useDrop Params
-| 参数 | 说明                | 类型   | 默认值 |
-| :--- | :------------------ | :----- | :----- |
-| onDrop  | 当有元素被拖入时执行的函数 | function | 无     |
+| Param | Type | Description |
+| --- | --- | --- |
+| effect | <code>\*</code> | 作用 |
+| deps | <code>\*</code> | 依赖 |
 
-### useDragableBox
-| 参数 | 说明                | 类型   | 默认值 |
-| :--- | :------------------ | :----- | :----- |
-| defaultWidth  | 默认宽度 | number | 无     |
-| minWidth  | 最小宽度 | number | 无     |
-| maxWidth  | 默认宽度 | number | 无     |
-| boxRef  | 默认宽度 | object | 无     |
-| siderRef  | 默认宽度 | object | 无     |
+<a name="usePrevious"></a>
 
+## usePrevious ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - 前一个值  
+**Description:**: 获取上一个值  
 
-## 更新日志
+| Param | Type | Description |
+| --- | --- | --- |
+| state | <code>\*</code> | 当前值 |
+| compare | <code>\*</code> | 比较函数, 返回true时更新上一个值，默认每次渲染都更新 |
 
-1. 2020.11.17 版本 0.0.1
-2. 2020.11.26 版本 0.0.2 添加轮询、定时器、DOM 操作的 hooks 封装
-3. 2020.12.10 版本 0.0.3 为useTable添加选项框功能
-4. 2020.12.22 版本 0.0.4 添加useDragableBox、usePrevious、useDeepCompareEffect、useUnmout等hooks封装, 优化usePolling和useRequest
+<a name="useUpdateEffect"></a>
+
+## useUpdateEffect
+**Kind**: global constant  
+**Description:**: 组件更新时执行的事件  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>\*</code> | 要执行的函数 |
+| deps | <code>\*</code> | 依赖项 |
+
+<a name="useUnmount"></a>
+
+## useUnmount
+**Kind**: global constant  
+**Description:**: 组件卸载时执行的操作  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| fn | <code>function</code> | 操作函数 |
+
+<a name="useIsUnmounted"></a>
+
+## useIsUnmounted ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - : 组件是否已卸载  
+**Description:**: 获取组件卸载状态  
+<a name="useIsMounted"></a>
+
+## useIsMounted ⇒ <code>\*</code>
+**Kind**: global constant  
+**Returns**: <code>\*</code> - : 组件是否已挂载  
+**Description:**: 获取组件卸载状态  
