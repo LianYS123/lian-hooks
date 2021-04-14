@@ -27,7 +27,7 @@ export const useEventListener = (target, eventName, listener) => {
 /**
  * @description: 监听元素大小变化
  * @param ref 元素ref引用
- * @return {*} {width, height}
+ * @return {{width: Number, height: Number}} {width, height}
  */
 export const useSize = (ref) => {
   const [size, setSize] = useState({

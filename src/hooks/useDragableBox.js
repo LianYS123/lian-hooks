@@ -4,13 +4,13 @@ import { getTargetElement } from './utils/dom';
 
 /**
  * @description: 拉伸容器
- * @param {object} options
- * @param {number} options.defaultWidth 默认宽度
- * @param {number} options.minWidth 最小宽度
- * @param {number} options.maxWidth 最大宽度
+ * @param {Object} options
+ * @param {Number} options.defaultWidth 默认宽度
+ * @param {Number} options.minWidth 最小宽度
+ * @param {Number} options.maxWidth 最大宽度
  * @param {*} options.target 被拉伸的容器
  * @param {*} options.siderTarget 用于拉伸的边缘
- * @return {object} 包含宽度和拖拽状态的对象
+ * @return {Object} 包含宽度和拖拽状态的对象
  */
 export const useDragableBox = (options) => {
   const { defaultWidth, minWidth, maxWidth, target, siderTarget } = options;

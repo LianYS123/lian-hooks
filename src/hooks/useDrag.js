@@ -3,7 +3,7 @@ import { useRef, useState, useMemo } from 'react';
 /**
  * @description: 获取可以被拖拽的元素属性
  * @param {Object} config 拖拽开始执行的函数, 拖拽结束执行的函数
- * @return {*} 一个获取拖拽属性的函数，入参为拖拽传输的数据
+ * @return {Function} 一个获取拖拽属性的函数，入参为拖拽传输的数据
  */
 export const useDrag = (config = {}) => {
   const { onDragStart, onDragEnd } = config;
@@ -22,7 +22,7 @@ export const useDrag = (config = {}) => {
 
 /**
  * @description: 获取接收被拖拽内容的元素的属性
- * @return {*} 释放元素属性
+ * @return {Object} 释放元素属性
  */
 export const useDrop = (options) => {
   const [isHovering, setIsHovering] = useState(false);

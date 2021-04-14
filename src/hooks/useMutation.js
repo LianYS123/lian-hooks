@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
  * @description: 异步方法的简单封装，处理请求的loading状态
  * @param {Function} method 异步方法
  * @param {Object} [initialData] 初始数据
- * @return {array} 异步方法和状态信息
+ * @return {Array} 异步方法和状态信息
  */
 export const useMutation = (method, initialData) => {
   const [loading, setLoading] = useState(false);

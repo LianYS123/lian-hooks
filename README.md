@@ -3,17 +3,17 @@
 <dl>
 <dt><a href="#useEventListener">useEventListener</a></dt>
 <dd></dd>
-<dt><a href="#useSize">useSize</a> ⇒ <code>*</code></dt>
+<dt><a href="#useSize">useSize</a> ⇒ <code>Object</code></dt>
 <dd></dd>
 <dt><a href="#useMouse">useMouse</a> ⇒ <code>*</code></dt>
 <dd></dd>
-<dt><a href="#useDrag">useDrag</a> ⇒ <code>*</code></dt>
+<dt><a href="#useDrag">useDrag</a> ⇒ <code>function</code></dt>
 <dd></dd>
-<dt><a href="#useDrop">useDrop</a> ⇒ <code>*</code></dt>
+<dt><a href="#useDrop">useDrop</a> ⇒ <code>Object</code></dt>
 <dd></dd>
-<dt><a href="#useDragableBox">useDragableBox</a> ⇒ <code>object</code></dt>
+<dt><a href="#useDragableBox">useDragableBox</a> ⇒ <code>Object</code></dt>
 <dd></dd>
-<dt><a href="#useMutation">useMutation</a> ⇒ <code>array</code></dt>
+<dt><a href="#useMutation">useMutation</a> ⇒ <code>Array</code></dt>
 <dd></dd>
 <dt><a href="#useRequest">useRequest</a></dt>
 <dd></dd>
@@ -23,8 +23,9 @@
 <dd></dd>
 <dt><a href="#useInterval">useInterval</a> ⇒ <code>*</code></dt>
 <dd></dd>
-<dt><a href="#useTimeout">useTimeout</a> ⇒ <code>*</code></dt>
-<dd></dd>
+<dt><a href="#useTimeout">useTimeout</a> ⇒ <code>function</code></dt>
+<dd><p>setTimeout的hooks实现</p>
+</dd>
 <dt><a href="#useThrottledValue">useThrottledValue</a> ⇒ <code>*</code></dt>
 <dd></dd>
 <dt><a href="#useDebouncedValue">useDebouncedValue</a> ⇒ <code>*</code></dt>
@@ -33,7 +34,7 @@
 <dd></dd>
 <dt><a href="#useCustomCompareEffect">useCustomCompareEffect</a></dt>
 <dd></dd>
-<dt><a href="#useDeepCompareEffect">useDeepCompareEffect</a> ⇒ <code>*</code></dt>
+<dt><a href="#useDeepCompareEffect">useDeepCompareEffect</a></dt>
 <dd></dd>
 <dt><a href="#usePrevious">usePrevious</a> ⇒ <code>*</code></dt>
 <dd></dd>
@@ -41,10 +42,18 @@
 <dd></dd>
 <dt><a href="#useUnmount">useUnmount</a></dt>
 <dd></dd>
-<dt><a href="#useIsUnmounted">useIsUnmounted</a> ⇒ <code>*</code></dt>
+<dt><a href="#useIsUnmounted">useIsUnmounted</a> ⇒ <code>Boolean</code></dt>
 <dd></dd>
-<dt><a href="#useIsMounted">useIsMounted</a> ⇒ <code>*</code></dt>
+<dt><a href="#useIsMounted">useIsMounted</a> ⇒ <code>Boolean</code></dt>
 <dd></dd>
+<dt><a href="#useLog">useLog</a></dt>
+<dd></dd>
+<dt><a href="#useFlag">useFlag</a> ⇒ <code>Object</code></dt>
+<dd><p>真假值状态封装</p>
+</dd>
+<dt><a href="#useModalAction">useModalAction</a> ⇒ <code>Object</code></dt>
+<dd><p>弹出框状态封装</p>
+</dd>
 </dl>
 
 <a name="useEventListener"></a>
@@ -61,9 +70,9 @@
 
 <a name="useSize"></a>
 
-## useSize ⇒ <code>\*</code>
+## useSize ⇒ <code>Object</code>
 **Kind**: global constant  
-**Returns**: <code>\*</code> - {width, height}  
+**Returns**: <code>Object</code> - {width, height}  
 **Description:**: 监听元素大小变化  
 
 | Param | Description |
@@ -78,9 +87,9 @@
 **Description:**: 获取鼠标位置信息  
 <a name="useDrag"></a>
 
-## useDrag ⇒ <code>\*</code>
+## useDrag ⇒ <code>function</code>
 **Kind**: global constant  
-**Returns**: <code>\*</code> - 一个获取拖拽属性的函数，入参为拖拽传输的数据  
+**Returns**: <code>function</code> - 一个获取拖拽属性的函数，入参为拖拽传输的数据  
 **Description:**: 获取可以被拖拽的元素属性  
 
 | Param | Type | Description |
@@ -89,31 +98,31 @@
 
 <a name="useDrop"></a>
 
-## useDrop ⇒ <code>\*</code>
+## useDrop ⇒ <code>Object</code>
 **Kind**: global constant  
-**Returns**: <code>\*</code> - 释放元素属性  
+**Returns**: <code>Object</code> - 释放元素属性  
 **Description:**: 获取接收被拖拽内容的元素的属性  
 <a name="useDragableBox"></a>
 
-## useDragableBox ⇒ <code>object</code>
+## useDragableBox ⇒ <code>Object</code>
 **Kind**: global constant  
-**Returns**: <code>object</code> - 包含宽度和拖拽状态的对象  
+**Returns**: <code>Object</code> - 包含宽度和拖拽状态的对象  
 **Description:**: 拉伸容器  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>object</code> |  |
-| options.defaultWidth | <code>number</code> | 默认宽度 |
-| options.minWidth | <code>number</code> | 最小宽度 |
-| options.maxWidth | <code>number</code> | 最大宽度 |
+| options | <code>Object</code> |  |
+| options.defaultWidth | <code>Number</code> | 默认宽度 |
+| options.minWidth | <code>Number</code> | 最小宽度 |
+| options.maxWidth | <code>Number</code> | 最大宽度 |
 | options.target | <code>\*</code> | 被拉伸的容器 |
 | options.siderTarget | <code>\*</code> | 用于拉伸的边缘 |
 
 <a name="useMutation"></a>
 
-## useMutation ⇒ <code>array</code>
+## useMutation ⇒ <code>Array</code>
 **Kind**: global constant  
-**Returns**: <code>array</code> - 异步方法和状态信息  
+**Returns**: <code>Array</code> - 异步方法和状态信息  
 **Description:**: 异步方法的简单封装，处理请求的loading状态  
 
 | Param | Type | Description |
@@ -129,13 +138,13 @@
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>object</code> | 配置 |
-| options.method | <code>\*</code> | 请求方法 |
-| [options.defaultParams] | <code>\*</code> | 默认参数 |
-| [options.necessaryParams] | <code>\*</code> | 必要参数 |
-| [options.ready] | <code>\*</code> | === true时发起请求，默认值为true |
+| options | <code>Object</code> | 配置 |
+| options.method | <code>function</code> | 请求方法 |
+| [options.defaultParams] | <code>Object</code> | 默认参数 |
+| [options.necessaryParams] | <code>Object</code> | 必要参数 |
+| [options.ready] | <code>Boolean</code> | === true时发起请求，默认值为true |
 | [options.initialData] | <code>\*</code> | 初始数据 |
-| [options.rest] | <code>\*</code> | 请求方法额外参数, onError事件等options可以通过这个参数传递 |
+| [options.rest] | <code>Array</code> | 请求方法额外参数, onError事件等options可以通过这个参数传递 |
 
 <a name="usePagination"></a>
 
@@ -175,20 +184,21 @@
 | Param | Type | Description |
 | --- | --- | --- |
 | func | <code>function</code> | 要执行的函数 |
-| interval | <code>number</code> | 执行间隔 |
+| interval | <code>Number</code> | 执行间隔 |
 | deps | <code>Array</code> | 依赖项 |
 
 <a name="useTimeout"></a>
 
-## useTimeout ⇒ <code>\*</code>
+## useTimeout ⇒ <code>function</code>
+setTimeout的hooks实现
+
 **Kind**: global constant  
-**Returns**: <code>\*</code> - clearTimeout  
-**Description:**: setTimeout的hooks实现  
+**Returns**: <code>function</code> - clearTimeout  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | <code>function</code> | 要执行的函数 |
-| timeout | <code>number</code> | 执行间隔 |
+| timeout | <code>Number</code> | 执行间隔 |
 | deps | <code>Array</code> | 依赖项 |
 
 <a name="useThrottledValue"></a>
@@ -201,7 +211,7 @@
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>\*</code> | 要节流的值 |
-| wait | <code>\*</code> | 节流时间间隔 |
+| wait | <code>Number</code> | 节流时间间隔 |
 
 <a name="useDebouncedValue"></a>
 
@@ -213,7 +223,7 @@
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>\*</code> | 要节流的值 |
-| wait | <code>\*</code> | 节流时间间隔 |
+| wait | <code>Number</code> | 节流时间间隔 |
 
 <a name="useShouldUpdateEffect"></a>
 
@@ -223,9 +233,9 @@
 
 | Param | Type | Description |
 | --- | --- | --- |
-| effect | <code>\*</code> | 作用 |
-| deps | <code>\*</code> | 依赖 |
-| shouldUpdate | <code>\*</code> | 是否执行作用，返回true执行effect |
+| effect | <code>EffectCallback</code> | 作用 |
+| deps | <code>Array</code> | 依赖 |
+| shouldUpdate | <code>function</code> | 是否执行作用，返回true执行effect |
 
 <a name="useCustomCompareEffect"></a>
 
@@ -235,20 +245,20 @@
 
 | Param | Type | Description |
 | --- | --- | --- |
-| effect | <code>\*</code> | 作用 |
-| deps | <code>\*</code> | 依赖 |
-| compare | <code>\*</code> | 自定义比较函数 |
+| effect | <code>EffectCallback</code> | 作用 |
+| deps | <code>Array</code> | 依赖 |
+| compare | <code>function</code> | 自定义比较函数 |
 
 <a name="useDeepCompareEffect"></a>
 
-## useDeepCompareEffect ⇒ <code>\*</code>
+## useDeepCompareEffect
 **Kind**: global constant  
 **Description:**: 使用深比较的useEffect  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| effect | <code>\*</code> | 作用 |
-| deps | <code>\*</code> | 依赖 |
+| effect | <code>EffectCallback</code> | 作用 |
+| deps | <code>Array</code> | 依赖 |
 
 <a name="usePrevious"></a>
 
@@ -260,7 +270,7 @@
 | Param | Type | Description |
 | --- | --- | --- |
 | state | <code>\*</code> | 当前值 |
-| compare | <code>\*</code> | 比较函数, 返回true时更新上一个值，默认每次渲染都更新 |
+| [compare] | <code>function</code> | 比较函数, 返回true时更新上一个值，默认每次渲染都更新 |
 
 <a name="useUpdateEffect"></a>
 
@@ -270,8 +280,8 @@
 
 | Param | Type | Description |
 | --- | --- | --- |
-| fn | <code>\*</code> | 要执行的函数 |
-| deps | <code>\*</code> | 依赖项 |
+| fn | <code>function</code> | 要执行的函数 |
+| deps | <code>Array</code> | 依赖项 |
 
 <a name="useUnmount"></a>
 
@@ -285,13 +295,45 @@
 
 <a name="useIsUnmounted"></a>
 
-## useIsUnmounted ⇒ <code>\*</code>
+## useIsUnmounted ⇒ <code>Boolean</code>
 **Kind**: global constant  
-**Returns**: <code>\*</code> - : 组件是否已卸载  
+**Returns**: <code>Boolean</code> - : 组件是否已卸载  
 **Description:**: 获取组件卸载状态  
 <a name="useIsMounted"></a>
 
-## useIsMounted ⇒ <code>\*</code>
+## useIsMounted ⇒ <code>Boolean</code>
 **Kind**: global constant  
-**Returns**: <code>\*</code> - : 组件是否已挂载  
+**Returns**: <code>Boolean</code> - : 组件是否已挂载  
 **Description:**: 获取组件卸载状态  
+<a name="useLog"></a>
+
+## useLog
+**Kind**: global constant  
+**Description:**: 值变化时打印  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| args | <code>array</code> | 打印内容 |
+
+<a name="useFlag"></a>
+
+## useFlag ⇒ <code>Object</code>
+真假值状态封装
+
+**Kind**: global constant  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| initialFlag | <code>\*</code> | 初始状态 |
+
+<a name="useModalAction"></a>
+
+## useModalAction ⇒ <code>Object</code>
+弹出框状态封装
+
+**Kind**: global constant  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [initialProps] | <code>Object</code> | modal属性初始值 |
+
