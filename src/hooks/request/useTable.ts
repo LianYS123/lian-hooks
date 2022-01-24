@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useRequest, RequestOptions, RequestResult } from './useRequest';
 import { usePagination, Pagination } from './usePagination';
-import { useRowSelection } from './useRowSelection';
 
-const defaultFormatter = ({ data = [] } = {}) => {
-  return { total: data.length, dataSource: data };
+const defaultFormatter = ({ data = [], total = 0 } = {}) => {
+  return { total: total || data.length, dataSource: data };
 };
 
 type ResultFormatter<R = any> = (
@@ -15,15 +14,30 @@ type ResultFormatter<R = any> = (
 };
 
 interface TalbeOptions<R> extends RequestOptions<R> {
-  rowSelection: any;
-  formatter: ResultFormatter;
+  /**
+   * 默认分页大小
+   */
+  defaultPageSize: number;
+
+  /**
+   * 格式化请求结果，返回total和dataSource
+   */
+  formatter?: ResultFormatter;
 }
 
 interface TableProps {
+  /**
+   * table的数据源
+   */
   dataSource?: any[];
+  /**
+   * 加载状态
+   */
   loading: boolean;
+  /**
+   * 分页
+   */
   pagination: Pagination;
-  rowSelection: any;
 }
 
 interface TableResult<R> extends RequestResult<R> {
@@ -34,12 +48,11 @@ interface TableResult<R> extends RequestResult<R> {
 }
 
 /**
- * @description: 封装方便antd table使用的hooks
+ * @description 封装方便antd table使用的hooks
  * @param {Object} options 配置信息
  * @param {Function} options.method 请求方法
  * @param {Number} [options.defaultPageSize = 10] 默认分页大小
  * @param {Object} [options.necessaryParams] 必要请求参数
- * @param {Object|Boolean} [options.rowSelection] 选择功能配置, 传true使用默认
  * @param {Function} [options.formatter] 请求结果数据转换函数, 返回{total, dataSource}
  */
 export const useTable = <R = any>(options: TalbeOptions<R>): TableResult<R> => {
@@ -48,7 +61,6 @@ export const useTable = <R = any>(options: TalbeOptions<R>): TableResult<R> => {
     defaultPageSize = 10,
     necessaryParams = {},
     formatter = defaultFormatter,
-    rowSelection: customConfig,
     ...rest
   } = options;
 
@@ -59,8 +71,6 @@ export const useTable = <R = any>(options: TalbeOptions<R>): TableResult<R> => {
     total,
     defaultPageSize,
   });
-
-  const rowSelection = useRowSelection(customConfig);
 
   const { data, loading, ...restState } = useRequest({
     method,
@@ -82,7 +92,6 @@ export const useTable = <R = any>(options: TalbeOptions<R>): TableResult<R> => {
     dataSource,
     loading,
     pagination,
-    rowSelection,
   };
 
   return {

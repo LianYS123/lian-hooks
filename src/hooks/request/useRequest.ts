@@ -1,30 +1,45 @@
 import { useRef } from 'react';
 import { useMutation, MutationState } from './useMutation';
-import { useDeepCompareEffect } from '../util-hooks';
+import { useDeepCompareEffect } from '../common/useDeepCompareEffect';
 
 export interface RequestOptions<R = any> {
-  method(...args: any): Promise<R>,
+  /**
+   * 请求方法
+   */
+  method(...args: any): Promise<R>;
+  /**
+   * 默认参数
+   */
   defaultParams?: {
-    [key: string]: string
-  },
+    [key: string]: string;
+  };
+  /**
+   * 必要参数，变化时会重新请求数据
+   */
   necessaryParams?: {
-    [key: string]: string
-  },
-  ready?: boolean,
-  initialData?: R,
-  [rest: string]: any
+    [key: string]: string;
+  };
+  /**
+   * 为true时发起请求
+   */
+  ready?: boolean;
+  /**
+   * 初始数据
+   */
+  initialData?: R;
+  [rest: string]: any;
 }
 
-export interface RequestResult<R> extends MutationState<R>  {
-  search: Function,
-  reload: Function,
+export interface RequestResult<R> extends MutationState<R> {
+  search: Function;
+  reload: Function;
   params: {
-    [key: string]: string
-  }
+    [key: string]: string;
+  };
 }
 
 /**
- * @description: 请求方法的简单封装，处理请求的loading状态
+ * @description 请求方法的简单封装，处理请求的loading状态
  * @param {Object} options 配置
  * @param {Function} options.method 请求方法
  * @param {Object} [options.defaultParams] 默认参数
@@ -70,6 +85,6 @@ export const useRequest = (options: RequestOptions) => {
     search: loadData,
     reload,
     params: { ...necessaryParamsRef.current, ...paramRef.current },
-    ...requestState
+    ...requestState,
   };
 };

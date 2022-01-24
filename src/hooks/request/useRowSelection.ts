@@ -1,7 +1,11 @@
-
 import { useState, useCallback } from 'react';
-import { useDeepCompareEffect } from '../util-hooks';
+import { useDeepCompareEffect } from '../common/useDeepCompareEffect';
 
+/**
+ * 表格的选择逻辑
+ * @param customConfig 配置
+ * @returns rowSelection
+ */
 export const useRowSelection = (customConfig: any) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [rowSelection, setRowSelection] = useState(customConfig);
@@ -26,4 +30,3 @@ export const useRowSelection = (customConfig: any) => {
   }, [selectedRowKeys, customConfig]);
   return rowSelection;
 };
-

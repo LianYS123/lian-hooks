@@ -6,7 +6,7 @@ export interface MutationState<R> {
   data?: R;
 }
 /**
- * @description: 异步方法的简单封装，处理请求的loading状态
+ * @description 异步方法的简单封装，处理请求的loading状态
  * @param {Function} method 异步方法
  * @param {Object} [initialData] 初始数据
  * @return {Array} 异步方法和状态信息
@@ -14,10 +14,7 @@ export interface MutationState<R> {
 export const useMutation = <R = any>(
   method: (...args: any) => Promise<R>,
   initialData?: R,
-): [
-  Function,
-  MutationState<R>,
-] => {
+): [Function, MutationState<R>] => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const [data, setData] = useState(initialData);
@@ -30,11 +27,11 @@ export const useMutation = <R = any>(
       const res = await methodRef.current(...params);
       setLoading(false);
       setData(res);
-    } catch (e) {
+    } catch (error) {
       setLoading(false);
-      setError(e);
+      setError(error as Error);
       // eslint-disable-next-line no-console
-      console.error(e);
+      console.error(error);
     }
   };
 

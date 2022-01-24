@@ -1,17 +1,44 @@
 import { useState, useEffect } from 'react';
-import { useMouse, useEventListener } from '../dom-hooks';
-import { getTargetElement, BasicTarget } from '../utils/dom';
+import { getTargetElement, BasicTarget } from '../../utils/dom';
+import { useMouse } from '../dom/useMouse';
+import { useEventListener } from '../dom/useEventListener';
 
 interface DragableBoxOption {
+  /**
+   * 默认宽度
+   */
   defaultWidth: number;
+  /**
+   * 最小宽度
+   */
   minWidth: number;
+  /**
+   * 最大宽度
+   */
   maxWidth: number;
+  /**
+   * 被拉伸的容器
+   */
   target: BasicTarget;
+  /**
+   * 用于拉伸的边缘
+   */
   siderTarget: BasicTarget;
 }
 
+interface DragableBoxResult {
+  /**
+   * 容器当前宽度
+   */
+  width: number;
+  /**
+   * 是否正在被拉伸
+   */
+  isDragging: boolean;
+}
+
 /**
- * @description: 拉伸容器
+ * @description 拉伸容器
  * @param {Object} options
  * @param {Number} options.defaultWidth 默认宽度
  * @param {Number} options.minWidth 最小宽度
@@ -20,7 +47,9 @@ interface DragableBoxOption {
  * @param {*} options.siderTarget 用于拉伸的边缘
  * @return {Object} 包含宽度和拖拽状态的对象
  */
-export const useDragableBox = (options: DragableBoxOption) => {
+export const useDragableBox = (
+  options: DragableBoxOption,
+): DragableBoxResult => {
   const { defaultWidth, minWidth, maxWidth, target, siderTarget } = options;
   const { clientX } = useMouse();
   const [width, setWidth] = useState(defaultWidth);
