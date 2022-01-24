@@ -21,7 +21,7 @@ export const useRequest = (options) => {
     initialData,
     ...rest
   } = options;
-  const [_method, requestState] = useMutation(method, initialData);
+  const [_method, requestState] = useMutation(method, initialData, rest);
   const paramRef = useRef(defaultParams);
   const necessaryParamsRef = useRef(necessaryParams);
   necessaryParamsRef.current = necessaryParams;

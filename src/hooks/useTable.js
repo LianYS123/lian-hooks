@@ -75,8 +75,8 @@ export const useTable = (options) => {
     necessaryParams = {},
     formatter = defaultFormatter,
     rowSelection: customConfig,
-    pageFieldName = "page",
-    pageSizeFieldName = "pageSize",
+    pageFieldName = 'page',
+    pageSizeFieldName = 'pageSize',
     ...rest
   } = options;
 
