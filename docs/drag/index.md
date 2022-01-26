@@ -1,5 +1,8 @@
 ---
-拖拽
+title: 拖拽
+nav:
+  title: 拖拽
+  order: 3
 ---
 
 ## useDrag & useDrop
@@ -15,11 +18,3 @@
 ### useDrop API
 
 <API hideTitle src='../../src/hooks/drag/useDrop.ts'></API>
-
-## useDragableBox
-
-可拖拽的容器（目前只支持左右拖拽）
-
-<code src="./DragableBoxDemo.jsx"></code>
-
-<API src='../../src/hooks/drag/useDragableBox.ts'></API>
